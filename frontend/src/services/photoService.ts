@@ -251,10 +251,16 @@ export class PhotoService {
         }
       )
 
-      return result || mockStudioPhotos
+      return result || mockStudioPhotos.map(photo => ({
+        ...photo,
+        sizes: PhotoService.generateImageSizes(photo)
+      }))
     } catch (error) {
       console.error('Failed to fetch photos, using mock data:', error)
-      return mockStudioPhotos
+      return mockStudioPhotos.map(photo => ({
+        ...photo,
+        sizes: PhotoService.generateImageSizes(photo)
+      }))
     }
   }
 
@@ -382,7 +388,10 @@ export class PhotoService {
         if (options?.limit) {
           filteredMock = filteredMock.slice(0, options.limit)
         }
-        return filteredMock
+        return filteredMock.map(photo => ({
+          ...photo,
+          sizes: PhotoService.generateImageSizes(photo)
+        }))
       }
     }
   }
@@ -439,10 +448,16 @@ export class PhotoService {
         }
       )
 
-      return result || mockStudioPhotos.filter(p => p.category === category)
+      return result || mockStudioPhotos.map(photo => ({
+        ...photo,
+        sizes: PhotoService.generateImageSizes(photo)
+      })).filter(p => p.category === category)
     } catch (error) {
       console.error(`Failed to fetch photos for category ${category}, using mock data:`, error)
-      return mockStudioPhotos.filter(p => p.category === category)
+      return mockStudioPhotos.map(photo => ({
+        ...photo,
+        sizes: PhotoService.generateImageSizes(photo)
+      })).filter(p => p.category === category)
     }
   }
 
