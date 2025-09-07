@@ -294,7 +294,7 @@ export class StudioService {
     nextOpenTime?: string
   }> {
     try {
-      const hours = await this.getBusinessHours(options)
+      const hours = await StudioService.getBusinessHours(options)
       
       if (!hours || hours.length === 0) {
         return {

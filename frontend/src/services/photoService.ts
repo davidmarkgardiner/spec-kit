@@ -747,7 +747,7 @@ export class PhotoService {
    * Check if photo is landscape/portrait/square
    */
   static getOrientation(photo: StudioPhoto): 'landscape' | 'portrait' | 'square' {
-    const aspectRatio = this.getAspectRatio(photo)
+    const aspectRatio = PhotoService.getAspectRatio(photo)
     
     if (aspectRatio > 1.1) return 'landscape'
     if (aspectRatio < 0.9) return 'portrait'
@@ -764,7 +764,7 @@ export class PhotoService {
     const parts = [photo.title]
     
     if (photo.category) {
-      const categoryName = this.getCategoryDisplayName(photo.category).toLowerCase()
+      const categoryName = PhotoService.getCategoryDisplayName(photo.category).toLowerCase()
       if (!photo.title.toLowerCase().includes(categoryName)) {
         parts.push(`in ${categoryName}`)
       }

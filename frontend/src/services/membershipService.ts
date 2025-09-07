@@ -261,7 +261,7 @@ export class MembershipService {
     dropIn: MembershipPlan[]
   }> {
     try {
-      const allPlans = await this.getMembershipPlans(options)
+      const allPlans = await MembershipService.getMembershipPlans(options)
       
       return {
         monthly: allPlans.filter(plan => plan.billingCycle === 'monthly'),

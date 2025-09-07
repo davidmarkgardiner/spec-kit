@@ -431,11 +431,14 @@ const pageDescription = 'Choose the perfect yoga membership plan for your lifest
 
           <!-- Contact Info & Studio Hours -->
           <div class="space-y-8">
-            <StudioInfo 
-              variant="contact"
-              className="bg-slate-50 rounded-xl p-8"
-              showFullDetails={true}
-            />
+            {studioData && (
+              <StudioInfo 
+                studioData={studioData}
+                variant="contact"
+                className="bg-slate-50 rounded-xl p-8"
+                showFullDetails={true}
+              />
+            )}
 
             <!-- Quick Actions -->
             <div class="bg-blue-50 rounded-xl p-6">

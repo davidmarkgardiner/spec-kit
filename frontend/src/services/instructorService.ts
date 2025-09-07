@@ -391,11 +391,11 @@ export class InstructorService {
     preview?: boolean
   }): Promise<Record<string, Instructor[]>> {
     try {
-      const specialties = await this.getAllSpecialties(options)
+      const specialties = await InstructorService.getAllSpecialties(options)
       const grouped: Record<string, Instructor[]> = {}
 
       for (const specialty of specialties) {
-        grouped[specialty] = await this.getInstructorsBySpecialty(specialty, options)
+        grouped[specialty] = await InstructorService.getInstructorsBySpecialty(specialty, options)
       }
 
       return grouped
@@ -416,8 +416,8 @@ export class InstructorService {
     topSpecialties: Array<{ specialty: string; count: number }>
   }> {
     try {
-      const instructors = await this.getInstructors(options)
-      const specialties = await this.getAllSpecialties(options)
+      const instructors = await InstructorService.getInstructors(options)
+      const specialties = await InstructorService.getAllSpecialties(options)
 
       const featuredCount = instructors.filter(i => i.featuredOrder !== undefined).length
       const totalExperience = instructors
@@ -607,7 +607,7 @@ export class InstructorService {
     options?: { preview?: boolean }
   ): Promise<Instructor | null> {
     try {
-      const instructors = await this.getInstructors(options)
+      const instructors = await InstructorService.getInstructors(options)
       return instructors.find(instructor => 
         this.generateSlug(instructor) === slug
       ) || null
