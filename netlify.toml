@@ -188,11 +188,8 @@
     event = "deploy-failed" 
     email = "admin@yourdomain.com"
 
-# Performance optimizations
-[build.processing.skip_processing]
-  paths = [
-    "admin/**"
-  ]
+# Performance optimizations - paths to skip processing
+# Note: skip_processing paths are handled in the main [build.processing] section above
 
 # Custom build settings for different branches
 [context.main]
