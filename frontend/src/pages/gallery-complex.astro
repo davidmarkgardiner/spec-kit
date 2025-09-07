@@ -1,0 +1,518 @@
+---
+// Gallery page - studio and class photos
+import Layout from '../layouts/Layout.astro'
+import PhotoGallery from '../components/PhotoGallery.astro'
+import { getAllPhotos, getPhotosByCategory, getFeaturedPhotos } from '../services/photoService'
+import { getStudioInfo } from '../services/studioService'
+
+// Fetch all required data
+const [studioData, allPhotos, featuredPhotos] = await Promise.all([
+  getStudioInfo({ preview: false }),
+  getAllPhotos({ preview: false }),
+  getFeaturedPhotos({ preview: false, limit: 12 })
+])
+
+// Group photos by category for filtering
+const categories = [...new Set(
+  allPhotos?.map(photo => photo.category).filter(Boolean) || []
+)].sort()
+
+// Page metadata
+const pageTitle = `Photo Gallery - ${studioData?.name || 'Yoga Studio'}`
+const pageDescription = 'Explore our beautiful yoga studio space, vibrant classes, and welcoming community through our photo gallery. See what makes our studio a special place to practice.'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/gallery"
+>
+  <main class="gallery-page">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient-to-br from-green-50 via-white to-blue-50 py-16 md:py-24">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-16">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
+            Studio Gallery
+          </h1>
+          <p class="text-xl md:text-2xl text-slate-600 leading-relaxed max-w-4xl mx-auto mb-8">
+            Step into our world through these images. From our thoughtfully designed spaces 
+            to the joy and connection found in our classes, see what makes our studio special.
+          </p>
+          
+          <!-- Quick Stats -->
+          <div class="flex flex-wrap justify-center gap-8 text-slate-700">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-green-600">{allPhotos?.length || '0'}</div>
+              <div class="text-sm font-medium">Photos</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600">{categories?.length || '0'}</div>
+              <div class="text-sm font-medium">Categories</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-purple-600">∞</div>
+              <div class="text-sm font-medium">Memories</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Photos Section -->
+    {featuredPhotos && featuredPhotos.length > 0 && (
+      <section class="featured-photos-section py-16 bg-white">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+              Featured Moments
+            </h2>
+            <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+              A curated selection of our favorite photos that capture the essence of our studio and community.
+            </p>
+          </div>
+
+          <PhotoGallery 
+            photos={featuredPhotos}
+            layout="masonry"
+            showFilters={false}
+            showLoadMore={false}
+            className="mb-8"
+          />
+        </div>
+      </section>
+    )}
+
+    <!-- Main Gallery Section -->
+    <section class="main-gallery-section py-16 bg-slate-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Complete Gallery
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Browse through all our photos organized by category. Click on any image to view it in full size.
+          </p>
+        </div>
+
+        <!-- Category Filters -->
+        {categories && categories.length > 0 && (
+          <div class="filter-section mb-12">
+            <div class="flex flex-wrap justify-center gap-4">
+              <button 
+                class="filter-button active px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors"
+                data-filter="all"
+              >
+                All Photos
+              </button>
+              {categories.map((category) => (
+                <button 
+                  class="filter-button px-6 py-3 bg-white text-slate-700 font-semibold rounded-full hover:bg-slate-100 border-2 border-slate-200 transition-colors"
+                  data-filter={category.toLowerCase().replace(/\s+/g, '-')}
+                  key={category}
+                >
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Photos Grid -->
+        {allPhotos && allPhotos.length > 0 ? (
+          <div class="photos-container">
+            <PhotoGallery 
+              photos={allPhotos}
+              layout="grid"
+              showFilters={true}
+              showLoadMore={true}
+              className="main-gallery"
+            />
+          </div>
+        ) : (
+          <div class="text-center py-16">
+            <div class="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Gallery Coming Soon</h3>
+            <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+              We're currently updating our photo gallery with beautiful images of our studio, 
+              classes, and community. Check back soon to see what we're all about!
+            </p>
+            <div class="mt-8">
+              <a 
+                href="/contact" 
+                class="inline-flex items-center px-8 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors duration-200"
+              >
+                Visit Us in Person
+                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Photo Categories Info Section -->
+    {categories && categories.length > 0 && (
+      <section class="categories-info-section py-16 bg-white">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+              What You'll See
+            </h2>
+            <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+              Our gallery showcases different aspects of studio life and the yoga experience.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Studio Space -->
+            <div class="category-info-card bg-slate-50 rounded-xl p-8 text-center">
+              <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 mb-4">Studio Spaces</h3>
+              <p class="text-slate-600">
+                Our thoughtfully designed practice rooms, reception area, changing facilities, 
+                and outdoor spaces that create the perfect environment for yoga.
+              </p>
+            </div>
+
+            <!-- Classes in Action -->
+            <div class="category-info-card bg-slate-50 rounded-xl p-8 text-center">
+              <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 mb-4">Classes & Practice</h3>
+              <p class="text-slate-600">
+                Dynamic shots of our classes in session, showing the energy, focus, 
+                and community spirit that defines our yoga practice.
+              </p>
+            </div>
+
+            <!-- Community Events -->
+            <div class="category-info-card bg-slate-50 rounded-xl p-8 text-center md:col-span-2 lg:col-span-1">
+              <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 mb-4">Community & Events</h3>
+              <p class="text-slate-600">
+                Special workshops, retreats, teacher trainings, and community gatherings 
+                that bring our yoga family together.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Photo Submission Section -->
+    <section class="photo-submission-section py-16 bg-gradient-to-r from-slate-50 to-green-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-4xl text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+          Share Your Yoga Journey
+        </h2>
+        <p class="text-xl text-slate-600 mb-12 max-w-3xl mx-auto">
+          We love seeing how yoga enriches your life! Share your practice photos with us 
+          and you might see them featured in our gallery.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div class="submission-method bg-white rounded-xl p-8 shadow-lg">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Email Us</h3>
+            <p class="text-slate-600 mb-6">
+              Send your favorite yoga photos to us and tell us your story.
+            </p>
+            <a 
+              href={`mailto:${studioData?.email}?subject=Photo Submission for Gallery`}
+              class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+            >
+              Send Photos
+              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+            </a>
+          </div>
+
+          <div class="submission-method bg-white rounded-xl p-8 shadow-lg">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 110 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 110-2h4zM9 6v10a1 1 0 001 1h4a1 1 0 001-1V6H9z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Tag Us on Social</h3>
+            <p class="text-slate-600 mb-6">
+              Use our hashtag and tag us in your yoga posts for a chance to be featured.
+            </p>
+            <div class="space-y-3">
+              <div class="text-sm text-slate-500 font-mono bg-slate-100 rounded-lg px-4 py-2">
+                #{studioData?.name?.toLowerCase().replace(/\s+/g, '') || 'yogastudio'}
+              </div>
+              <div class="text-sm text-slate-500 font-mono bg-slate-100 rounded-lg px-4 py-2">
+                #yogacommunity
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-12 bg-white rounded-xl p-6 shadow-lg max-w-2xl mx-auto">
+          <h4 class="text-lg font-bold text-slate-900 mb-3">Photo Guidelines</h4>
+          <div class="text-left text-sm text-slate-600 space-y-2">
+            <div class="flex items-start">
+              <span class="text-green-600 mr-2">•</span>
+              <span>High-resolution images preferred (at least 1200px wide)</span>
+            </div>
+            <div class="flex items-start">
+              <span class="text-green-600 mr-2">•</span>
+              <span>Include permission for any people visible in photos</span>
+            </div>
+            <div class="flex items-start">
+              <span class="text-green-600 mr-2">•</span>
+              <span>Tell us the story behind your photo</span>
+            </div>
+            <div class="flex items-start">
+              <span class="text-green-600 mr-2">•</span>
+              <span>We reserve the right to choose which photos to feature</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visit Studio CTA -->
+    <section class="visit-cta-section py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-4xl text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+          Experience It Yourself
+        </h2>
+        <p class="text-xl text-slate-600 mb-12 max-w-2xl mx-auto">
+          Photos can only capture so much. Come visit our studio and feel the energy, 
+          warmth, and sense of community that makes our space truly special.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+          <a 
+            href="/contact" 
+            class="inline-flex items-center justify-center px-8 py-4 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors duration-200"
+          >
+            Schedule Your Visit
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </a>
+          
+          <a 
+            href="/membership" 
+            class="inline-flex items-center justify-center px-8 py-4 border-2 border-slate-900 text-slate-900 font-semibold rounded-full hover:bg-slate-900 hover:text-white transition-all duration-200"
+          >
+            View Membership Options
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ImageGallery",
+    "name": "Yoga Studio Photo Gallery",
+    "description": "{pageDescription}",
+    "url": "{Astro.url.href}",
+    "about": {
+      "@type": "YogaStudio",
+      "name": "{studioData?.name || 'Yoga Studio'}",
+      "description": "A welcoming yoga studio featuring various classes and community events"
+    },
+    "image": allPhotos ? allPhotos.slice(0, 10).map(photo => ({
+      "@type": "ImageObject",
+      "url": photo.sizes.large,
+      "description": photo.alt || photo.title,
+      "contentUrl": photo.sizes.large,
+      "thumbnail": photo.sizes.thumbnail
+    })) : []
+  }
+  </script>
+</Layout>
+
+<style>
+  .gallery-page {
+    @apply min-h-screen;
+  }
+
+  /* Filter Button Styles */
+  .filter-button.active {
+    @apply bg-green-600 text-white border-green-600;
+  }
+
+  .filter-button.active:hover {
+    @apply bg-green-700;
+  }
+
+  /* Category Info Cards */
+  .category-info-card {
+    @apply transform hover:scale-105 transition-all duration-200 hover:shadow-lg;
+  }
+
+  /* Submission Methods */
+  .submission-method {
+    @apply transform hover:scale-105 transition-all duration-200;
+  }
+
+  /* Photo Container Animations */
+  .photos-container {
+    @apply transition-all duration-500;
+  }
+
+  .photos-container.loading {
+    @apply opacity-50;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .gallery-page h1 {
+      @apply text-3xl;
+    }
+    
+    .gallery-page h2 {
+      @apply text-2xl;
+    }
+
+    .filter-button {
+      @apply text-sm px-4 py-2;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    .gallery-page {
+      @apply text-black bg-white;
+    }
+    
+    .hero-section,
+    .featured-photos-section,
+    .main-gallery-section,
+    .categories-info-section,
+    .photo-submission-section,
+    .visit-cta-section {
+      @apply shadow-none;
+    }
+
+    .filter-button {
+      @apply hidden;
+    }
+  }
+
+  /* Accessibility */
+  .filter-button:focus {
+    @apply ring-4 ring-green-200 outline-none;
+  }
+
+  .submission-method a:focus {
+    @apply ring-4 ring-blue-200 outline-none;
+  }
+
+  /* Loading States */
+  .gallery-loading {
+    @apply animate-pulse;
+  }
+
+  .gallery-loading .photo-placeholder {
+    @apply bg-slate-200 rounded-lg;
+  }
+</style>
+
+<script>
+  // Filter functionality for main gallery
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-button')
+    const photosContainer = document.querySelector('.photos-container')
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.getAttribute('data-filter')
+        
+        // Update active button
+        filterButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-green-600', 'text-white', 'border-green-600')
+          btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200')
+        })
+        
+        button.classList.add('active', 'bg-green-600', 'text-white', 'border-green-600')
+        button.classList.remove('bg-white', 'text-slate-700', 'border-slate-200')
+        
+        // Add loading state
+        if (photosContainer) {
+          photosContainer.classList.add('loading')
+          
+          // Simulate filter application (this would integrate with PhotoGallery component)
+          setTimeout(() => {
+            photosContainer.classList.remove('loading')
+            
+            // Trigger custom event that PhotoGallery component can listen to
+            const filterEvent = new CustomEvent('galleryFilter', {
+              detail: { filter: filter }
+            })
+            document.dispatchEvent(filterEvent)
+          }, 200)
+        }
+      })
+    })
+
+    // Smooth scroll for CTA buttons
+    const ctaButtons = document.querySelectorAll('a[href^="/"]')
+    ctaButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        // Add subtle feedback
+        button.style.transform = 'scale(0.98)'
+        setTimeout(() => {
+          button.style.transform = ''
+        }, 100)
+      })
+    })
+
+    // Lazy loading for images (if not handled by PhotoGallery component)
+    const observerOptions = {
+      rootMargin: '100px',
+      threshold: 0.1
+    }
+
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target
+          if (img.dataset.src) {
+            img.src = img.dataset.src
+            img.classList.remove('gallery-loading')
+            imageObserver.unobserve(img)
+          }
+        }
+      })
+    }, observerOptions)
+
+    // Observe all images with data-src attribute
+    document.querySelectorAll('img[data-src]').forEach(img => {
+      imageObserver.observe(img)
+    })
+  })
+</script>

@@ -1,0 +1,421 @@
+---
+// StudioInfo component - displays core studio information
+// This component implements the contract from StudioInfo.test.ts
+export interface Props {
+  studioData: {
+    name: string
+    tagline?: string
+    description: string
+    address: {
+      street: string
+      city: string
+      state: string
+      zipCode: string
+    }
+    phone: string
+    email: string
+    website?: string
+    socialMedia?: Array<{
+      platform: string
+      url: string
+    }>
+    hours: Array<{
+      day: string
+      openTime?: string
+      closeTime?: string
+      isClosed: boolean
+    }>
+  }
+  className?: string
+  variant?: 'default' | 'compact' | 'full'
+}
+
+const { studioData, className = '', variant = 'default' } = Astro.props
+
+// Format phone number for tel: link
+const formatPhoneForTel = (phone: string) => {
+  return '+1' + phone.replace(/\D/g, '')
+}
+
+// Format time from 24-hour to 12-hour
+const formatTime = (time: string) => {
+  if (!time) return ''
+  const [hours, minutes] = time.split(':')
+  const hour24 = parseInt(hours)
+  const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24
+  const ampm = hour24 >= 12 ? 'PM' : 'AM'
+  return `${hour12}:${minutes} ${ampm}`
+}
+
+// Get social media icon
+const getSocialIcon = (platform: string) => {
+  const icons: { [key: string]: string } = {
+    instagram: '📷',
+    facebook: '📘', 
+    twitter: '🐦',
+    youtube: '📹',
+    tiktok: '🎵'
+  }
+  return icons[platform] || '📱'
+}
+
+// Format address for display
+const formatAddress = (address: any) => {
+  const parts = [address.street, address.city, address.state, address.zipCode]
+  return parts.filter(Boolean).join(', ')
+}
+---
+
+<div 
+  data-testid="studio-info" 
+  class={`studio-info ${variant} ${className} responsive mobile grid`}
+>
+  <div class="studio-info__header">
+    <h1 data-testid="studio-name" class="studio-info__name">
+      {studioData.name}
+    </h1>
+    
+    {studioData.tagline && (
+      <p data-testid="studio-tagline" class="studio-info__tagline">
+        {studioData.tagline}
+      </p>
+    )}
+  </div>
+
+  <div class="studio-info__content">
+    <div class="studio-info__description">
+      <p data-testid="studio-description">
+        {studioData.description}
+      </p>
+    </div>
+
+    <div class="studio-info__contact">
+      <address data-testid="studio-address" class="studio-info__address">
+        <div class="address-line">
+          {studioData.address.street}
+        </div>
+        <div class="address-line">
+          {studioData.address.city}, {studioData.address.state} {studioData.address.zipCode}
+        </div>
+      </address>
+
+      <div class="contact-links">
+        <a 
+          href={`tel:${formatPhoneForTel(studioData.phone)}`}
+          data-testid="studio-phone"
+          class="contact-link phone-link"
+          aria-label={`Call studio at ${studioData.phone}`}
+        >
+          📞 {studioData.phone}
+        </a>
+
+        <a 
+          href={`mailto:${studioData.email}`}
+          data-testid="studio-email"
+          class="contact-link email-link"
+          aria-label={`Email studio at ${studioData.email}`}
+        >
+          ✉️ {studioData.email}
+        </a>
+
+        {studioData.website && (
+          <a 
+            href={studioData.website}
+            data-testid="studio-website"
+            class="contact-link website-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            🌐 Visit Our Website
+          </a>
+        )}
+      </div>
+    </div>
+
+    <div data-testid="business-hours" class="studio-info__hours">
+      <h3 class="hours-title">Hours</h3>
+      <div class="hours-list">
+        {studioData.hours.map((dayHours) => (
+          <div 
+            key={dayHours.day}
+            data-testid={`hours-${dayHours.day}`} 
+            class="hours-item"
+          >
+            <span class="day-name">
+              {dayHours.day.charAt(0).toUpperCase() + dayHours.day.slice(1)}:
+            </span>
+            <span class="day-hours">
+              {dayHours.isClosed ? (
+                'Closed'
+              ) : (
+                `${formatTime(dayHours.openTime!)} - ${formatTime(dayHours.closeTime!)}`
+              )}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {studioData.socialMedia && studioData.socialMedia.length > 0 && (
+      <div data-testid="social-media-section" class="studio-info__social">
+        <h3 class="social-title">Follow Us</h3>
+        <div class="social-links">
+          {studioData.socialMedia.map((social) => (
+            <a
+              key={social.platform}
+              href={social.url}
+              data-testid={`social-link-${social.platform}`}
+              class="social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Follow us on ${social.platform}`}
+            >
+              <span class="social-icon">{getSocialIcon(social.platform)}</span>
+              <span class="social-platform">{social.platform}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+.studio-info {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.studio-info.compact {
+  padding: 1rem;
+}
+
+.studio-info__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.studio-info__name {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2d5a27;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.studio-info__tagline {
+  font-size: 1.25rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 0;
+}
+
+.studio-info__content {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+.studio-info__description p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #374151;
+  margin: 0;
+}
+
+.studio-info__contact {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.studio-info__address {
+  font-style: normal;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.address-line {
+  margin-bottom: 0.25rem;
+}
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  color: #374151;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-height: 44px; /* Touch target */
+}
+
+.contact-link:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.contact-link:focus {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
+.studio-info__hours {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.hours-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d5a27;
+  margin: 0 0 1rem 0;
+}
+
+.hours-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.hours-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.hours-item:last-child {
+  border-bottom: none;
+}
+
+.day-name {
+  font-weight: 500;
+  color: #374151;
+  text-transform: capitalize;
+}
+
+.day-hours {
+  color: #6b7280;
+}
+
+.studio-info__social {
+  text-align: center;
+}
+
+.social-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d5a27;
+  margin: 0 0 1rem 0;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  min-height: 44px; /* Touch target */
+}
+
+.social-link:hover {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.social-link:focus {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
+.social-icon {
+  font-size: 1.5rem;
+}
+
+.social-platform {
+  text-transform: capitalize;
+}
+
+/* Responsive design */
+@media (min-width: 768px) {
+  .studio-info__content {
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+  }
+  
+  .contact-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .contact-link {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .social-links {
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .studio-info {
+    padding: 3rem;
+  }
+  
+  .studio-info__name {
+    font-size: 3rem;
+  }
+  
+  .studio-info__content {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* Print styles */
+@media print {
+  .studio-info {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  .contact-link {
+    background: none;
+    border: 1px solid #000;
+  }
+}
+</style>

@@ -1,0 +1,164 @@
+---
+// Simple About page without complex components
+import Layout from '../layouts/Layout.astro'
+
+const pageTitle = 'About Serenity Yoga Studio - Your Journey to Wellness'
+const pageDescription = 'Learn about our yoga studio, experienced instructors, and commitment to helping you discover inner peace and physical wellness through mindful movement.'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/about"
+>
+  <main class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-blue-50 to-white py-20">
+      <div class="container mx-auto px-4 max-w-4xl text-center">
+        <h1 class="text-5xl font-bold text-gray-800 mb-6">About Serenity Yoga Studio</h1>
+        <p class="text-xl text-gray-600 leading-relaxed">
+          Discover a space dedicated to nurturing your mind, body, and spirit through the ancient practice of yoga.
+        </p>
+      </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Our Story</h2>
+            <div class="space-y-4 text-gray-600">
+              <p>
+                Founded in 2018, Serenity Yoga Studio began as a vision to create a welcoming space where people of all backgrounds and experience levels could explore the transformative power of yoga.
+              </p>
+              <p>
+                Our studio is more than just a place to practice—it's a community. We believe yoga is for everyone, regardless of age, flexibility, or experience. Our mission is to provide a supportive environment where you can discover your own unique path to wellness.
+              </p>
+              <p>
+                Located in the heart of Mindful Valley, our beautiful studio features natural lighting, sustainable materials, and a peaceful atmosphere that encourages mindfulness and inner growth.
+              </p>
+            </div>
+          </div>
+          <div class="bg-green-100 h-80 rounded-lg flex items-center justify-center">
+            <p class="text-green-600 font-semibold">Studio Interior Photo</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Values Section -->
+    <section class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Values</h2>
+          <p class="text-xl text-gray-600">The principles that guide everything we do</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="text-center">
+            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🧘‍♀️</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Inclusivity</h3>
+            <p class="text-gray-600">
+              Everyone is welcome at our studio. We celebrate diversity and create a safe space for all bodies, all levels, all backgrounds.
+            </p>
+          </div>
+          
+          <div class="text-center">
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🌱</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Growth</h3>
+            <p class="text-gray-600">
+              We support your journey of personal growth, whether you're building physical strength, mental clarity, or spiritual connection.
+            </p>
+          </div>
+          
+          <div class="text-center">
+            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🤝</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">Community</h3>
+            <p class="text-gray-600">
+              Yoga is better together. We foster meaningful connections and support each other on and off the mat.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Instructors Preview Section -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">Meet Our Teachers</h2>
+          <p class="text-xl text-gray-600">Experienced, passionate instructors dedicated to your practice</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Instructor 1 -->
+          <div class="text-center">
+            <div class="bg-gray-200 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <span class="text-gray-500 text-sm">Photo</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Sarah Chen</h3>
+            <p class="text-blue-600 font-medium mb-3">Senior Instructor</p>
+            <p class="text-gray-600 text-sm">
+              Specializes in Vinyasa and Yin yoga with 8+ years of teaching experience. Sarah brings mindfulness and compassion to every class.
+            </p>
+          </div>
+          
+          <!-- Instructor 2 -->
+          <div class="text-center">
+            <div class="bg-gray-200 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <span class="text-gray-500 text-sm">Photo</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Michael Rodriguez</h3>
+            <p class="text-blue-600 font-medium mb-3">Lead Instructor</p>
+            <p class="text-gray-600 text-sm">
+              Expert in Hatha and Restorative yoga with a focus on alignment and breath work. Known for his grounding presence.
+            </p>
+          </div>
+          
+          <!-- Instructor 3 -->
+          <div class="text-center">
+            <div class="bg-gray-200 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <span class="text-gray-500 text-sm">Photo</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Emily Johnson</h3>
+            <p class="text-blue-600 font-medium mb-3">Instructor</p>
+            <p class="text-gray-600 text-sm">
+              Power yoga instructor who makes classes accessible for all levels. Focuses on building strength and flexibility.
+            </p>
+          </div>
+        </div>
+        
+        <div class="text-center mt-12">
+          <a href="/instructors" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            Meet All Our Instructors
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="py-16 bg-blue-600 text-white">
+      <div class="container mx-auto px-4 max-w-4xl text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
+        <p class="text-xl mb-8 opacity-90">
+          Join our welcoming community and discover what yoga can do for you.
+        </p>
+        <div class="flex justify-center space-x-4">
+          <a href="/membership" class="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+            View Membership Plans
+          </a>
+          <a href="/contact" class="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-blue-600 transition-colors font-semibold">
+            Contact Us
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

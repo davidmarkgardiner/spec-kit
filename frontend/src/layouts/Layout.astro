@@ -1,0 +1,361 @@
+---
+// Layout component - main site layout with header, footer, and SEO
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import '../styles/global.css'
+
+// Layout props interface
+export interface Props {
+  title: string
+  description: string
+  canonical?: string
+  ogImage?: string
+  noindex?: boolean
+  structuredData?: object
+  bodyClass?: string
+  lang?: string
+}
+
+// Extract props with defaults
+const {
+  title,
+  description,
+  canonical,
+  ogImage,
+  noindex = false,
+  structuredData,
+  bodyClass = '',
+  lang = 'en'
+} = Astro.props
+
+// Get site URL from environment or default
+const siteUrl = Astro.site?.href || 'https://localhost:4321'
+const currentUrl = new URL(Astro.url.pathname, siteUrl).href
+const canonicalUrl = canonical ? new URL(canonical, siteUrl).href : currentUrl
+
+// Default OG image
+const defaultOgImage = new URL('/images/og-default.jpg', siteUrl).href
+const ogImageUrl = ogImage ? new URL(ogImage, siteUrl).href : defaultOgImage
+
+// Site metadata
+const siteName = 'Yoga Studio'
+const siteDescription = 'A welcoming yoga studio offering classes for all levels, experienced instructors, and a supportive community focused on mindful movement and wellness.'
+
+// Generate page title
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`
+---
+
+<!DOCTYPE html>
+<html lang={lang} class="h-full">
+  <head>
+    <!-- Basic Meta Tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Title and Description -->
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Robots -->
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {!noindex && <meta name="robots" content="index, follow" />}
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:alt" content={`${title} - ${siteName}`} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalUrl} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={`${title} - ${siteName}`} />
+    
+    <!-- Additional SEO Meta -->
+    <meta name="author" content={siteName} />
+    <meta name="publisher" content={siteName} />
+    <meta name="theme-color" content="#7dd3fc" />
+    <meta name="msapplication-TileColor" content="#7dd3fc" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content={siteName} />
+    
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#7dd3fc" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.sanity.io" />
+    
+    <!-- Google Fonts -->
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" 
+      rel="stylesheet"
+    />
+    
+    <!-- DNS Prefetch for performance -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="//cdn.sanity.io" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/images/hero-bg.webp" as="image" />
+    
+    <!-- PWA Meta -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content={siteName} />
+    
+    <!-- Schema.org structured data -->
+    {structuredData && (
+      <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    )}
+    
+    <!-- Default structured data for organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "{siteName}",
+      "url": "{siteUrl}",
+      "description": "{siteDescription}",
+      "sameAs": [
+        "https://www.facebook.com/yogastudio",
+        "https://www.instagram.com/yogastudio",
+        "https://twitter.com/yogastudio"
+      ]
+    }
+    </script>
+    
+    <!-- Analytics placeholder -->
+    <!-- Google Analytics 4 -->
+    <!-- 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    -->
+    
+    <!-- Cookie Consent -->
+    <!-- Add cookie consent script if needed -->
+    
+    <!-- Critical CSS inlined for performance -->
+    <style>
+      /* Critical path CSS - above the fold content only */
+      body {
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.7;
+        color: #334155;
+        background: linear-gradient(135deg, #fef7f0 0%, #f0f9ff 50%, #f3f4f6 100%);
+        background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-size-adjust: 100%;
+      }
+      
+      /* Skip link styles */
+      .skip-link {
+        position: absolute;
+        top: -100px;
+        left: 1rem;
+        z-index: 1600;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #7dd3fc, #38bdf8);
+        color: white;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 300ms ease;
+        box-shadow: 0 4px 15px rgba(125, 211, 252, 0.4);
+      }
+      
+      .skip-link:focus {
+        top: 1rem;
+      }
+      
+      /* Loading state */
+      .page-loading {
+        opacity: 0;
+        transition: opacity 300ms ease;
+      }
+      
+      .page-loaded {
+        opacity: 1;
+      }
+      
+      /* Prevent flash of unstyled content */
+      .fouc-guard {
+        visibility: hidden;
+      }
+      
+      .fonts-loaded .fouc-guard {
+        visibility: visible;
+      }
+    </style>
+  </head>
+  
+  <body class={`min-h-screen ${bodyClass} fonts-loaded page-loaded`} style="margin: 0; padding: 0; display: flex; flex-direction: column;">
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="skip-link">
+      Skip to main content
+    </a>
+    
+    <!-- Site Header -->
+    <Header />
+    
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1" role="main" style="margin-top: 0; padding-top: 2rem; min-height: 60vh;">
+      <slot />
+    </main>
+    
+    <!-- Site Footer -->
+    <Footer />
+    
+    <!-- Scroll to Top Button -->
+    <button 
+      id="scroll-to-top"
+      class="fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-br from-sky-200 to-blue-300 text-slate-700 rounded-full shadow-xl hover:shadow-2xl transform translate-y-16 transition-all duration-300 opacity-0 pointer-events-none backdrop-blur-sm border border-white/40"
+      aria-label="Scroll to top"
+      type="button"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+      </svg>
+    </button>
+    
+    <!-- Loading Indicator -->
+    <div 
+      id="loading-indicator" 
+      class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-400 via-blue-400 to-purple-300 transform -translate-x-full transition-transform duration-500 z-50"
+      role="progressbar"
+      aria-label="Page loading"
+    ></div>
+    
+    <!-- Toast Container for Notifications -->
+    <div 
+      id="toast-container" 
+      class="fixed top-4 right-4 z-50 space-y-2"
+      role="region"
+      aria-label="Notifications"
+      aria-live="polite"
+    ></div>
+    
+    <!-- JavaScript for Layout Functionality -->
+    <script is:inline>
+      // Simple page initialization
+      window.addEventListener('load', function() {
+        document.body.classList.remove('page-loading')
+        document.body.classList.add('page-loaded')
+        document.body.classList.add('fonts-loaded')
+      })
+      
+      // Simple scroll to top functionality
+      window.addEventListener('load', function() {
+        const scrollBtn = document.getElementById('scroll-to-top')
+        if (scrollBtn) {
+          scrollBtn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          })
+        }
+      })
+    </script>
+    
+    <!-- Structured Data Script Injection Point -->
+    <script type="application/ld+json" id="additional-structured-data"></script>
+  </body>
+</html>
+
+<style>
+  /* Layout specific styles that can't be in global.css */
+  
+  /* Smooth scrolling for all browsers */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  
+  /* Focus management for skip links */
+  #main-content:focus {
+    outline: none;
+  }
+  
+  /* Print styles specific to layout */
+  @media print {
+    .skip-link,
+    #scroll-to-top,
+    #loading-indicator,
+    #toast-container {
+      display: none !important;
+    }
+    
+    body {
+      font-size: 12pt;
+      line-height: 1.4;
+    }
+    
+    main {
+      margin: 0;
+      padding: 0;
+    }
+  }
+  
+  /* High contrast mode adjustments */
+  @media (prefers-contrast: high) {
+    #scroll-to-top {
+      border: 2px solid white;
+    }
+    
+    .skip-link {
+      border: 2px solid white;
+    }
+  }
+  
+  /* Motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    #scroll-to-top,
+    #loading-indicator,
+    .skip-link,
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+  
+  /* Dark mode support (if enabled) */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+  }
+</style>

@@ -1,0 +1,815 @@
+/* Responsive utilities and helper classes */
+/* Extends Tailwind CSS with custom utility classes for yoga studio website */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom Utility Classes */
+@layer utilities {
+  /* ========================================
+     RESPONSIVE TYPOGRAPHY
+     ======================================== */
+  
+  /* Fluid typography that scales between breakpoints */
+  .text-fluid-xs {
+    font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  }
+  
+  .text-fluid-sm {
+    font-size: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  }
+  
+  .text-fluid-base {
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  }
+  
+  .text-fluid-lg {
+    font-size: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+  }
+  
+  .text-fluid-xl {
+    font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  }
+  
+  .text-fluid-2xl {
+    font-size: clamp(1.5rem, 1.3rem + 1vw, 1.875rem);
+  }
+  
+  .text-fluid-3xl {
+    font-size: clamp(1.875rem, 1.6rem + 1.375vw, 2.25rem);
+  }
+  
+  .text-fluid-4xl {
+    font-size: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);
+  }
+  
+  .text-fluid-5xl {
+    font-size: clamp(3rem, 2.5rem + 2.5vw, 3.75rem);
+  }
+  
+  .text-fluid-6xl {
+    font-size: clamp(3.75rem, 3rem + 3.75vw, 4.5rem);
+  }
+
+  /* ========================================
+     RESPONSIVE SPACING
+     ======================================== */
+  
+  /* Container with responsive padding */
+  .container-fluid {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container-fluid {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-fluid {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .container-fluid {
+      max-width: 1280px;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  /* Responsive section spacing */
+  .section-padding {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  @media (min-width: 768px) {
+    .section-padding {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-top: 6rem;
+      padding-bottom: 6rem;
+    }
+  }
+  
+  /* Responsive vertical rhythm */
+  .space-y-fluid > * + * {
+    margin-top: clamp(1rem, 2vw, 2rem);
+  }
+  
+  .space-y-fluid-lg > * + * {
+    margin-top: clamp(1.5rem, 3vw, 3rem);
+  }
+  
+  .space-y-fluid-xl > * + * {
+    margin-top: clamp(2rem, 4vw, 4rem);
+  }
+
+  /* ========================================
+     RESPONSIVE GRIDS
+     ======================================== */
+  
+  /* Auto-fit grid with responsive min column width */
+  .grid-auto-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .grid-auto-fit-sm {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .grid-auto-fit-lg {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  /* Responsive card grid */
+  .grid-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 640px) {
+    .grid-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .grid-cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .grid-cards {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  /* Masonry-style grid */
+  .grid-masonry {
+    columns: 1;
+    column-gap: 1.5rem;
+  }
+  
+  @media (min-width: 640px) {
+    .grid-masonry {
+      columns: 2;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .grid-masonry {
+      columns: 3;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .grid-masonry {
+      columns: 4;
+    }
+  }
+  
+  .grid-masonry > * {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ========================================
+     ASPECT RATIOS & RESPONSIVE IMAGES
+     ======================================== */
+  
+  /* Responsive aspect ratio containers */
+  .aspect-responsive {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .aspect-responsive::before {
+    content: '';
+    display: block;
+    padding-top: 75%; /* 4:3 default */
+  }
+  
+  .aspect-responsive > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Video aspect ratio */
+  .aspect-responsive-video::before {
+    padding-top: 56.25%; /* 16:9 */
+  }
+  
+  /* Square aspect ratio */
+  .aspect-responsive-square::before {
+    padding-top: 100%; /* 1:1 */
+  }
+  
+  /* Portrait aspect ratio */
+  .aspect-responsive-portrait::before {
+    padding-top: 133.33%; /* 3:4 */
+  }
+  
+  /* Wide aspect ratio */
+  .aspect-responsive-wide::before {
+    padding-top: 41.67%; /* 12:5 */
+  }
+  
+  /* Responsive image with loading state */
+  .img-responsive {
+    width: 100%;
+    height: auto;
+    display: block;
+    background-color: #f1f5f9;
+    background-image: linear-gradient(45deg, transparent 25%, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.05) 50%, transparent 50%, transparent 75%, rgba(0,0,0,0.05) 75%);
+    background-size: 20px 20px;
+    animation: loading-shimmer 2s infinite linear;
+    transition: opacity 0.3s ease;
+  }
+  
+  .img-responsive[data-loaded="true"] {
+    background: none;
+    animation: none;
+  }
+  
+  @keyframes loading-shimmer {
+    0% { background-position: 0 0; }
+    100% { background-position: 40px 40px; }
+  }
+
+  /* ========================================
+     RESPONSIVE FLEXBOX UTILITIES
+     ======================================== */
+  
+  /* Responsive flex direction */
+  .flex-responsive {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .flex-responsive {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+  }
+  
+  .flex-responsive-reverse {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .flex-responsive-reverse {
+      flex-direction: row-reverse;
+      gap: 1.5rem;
+    }
+  }
+  
+  /* Responsive flex wrap */
+  .flex-wrap-responsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .flex-wrap-responsive > * {
+    flex: 1 1 100%;
+  }
+  
+  @media (min-width: 640px) {
+    .flex-wrap-responsive > * {
+      flex: 1 1 calc(50% - 0.5rem);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .flex-wrap-responsive > * {
+      flex: 1 1 calc(33.333% - 0.667rem);
+    }
+  }
+
+  /* ========================================
+     RESPONSIVE VISIBILITY
+     ======================================== */
+  
+  /* Show/hide at specific breakpoints */
+  .show-mobile-only {
+    display: block;
+  }
+  
+  @media (min-width: 768px) {
+    .show-mobile-only {
+      display: none;
+    }
+  }
+  
+  .hide-mobile {
+    display: none;
+  }
+  
+  @media (min-width: 768px) {
+    .hide-mobile {
+      display: block;
+    }
+  }
+  
+  .show-tablet-up {
+    display: none;
+  }
+  
+  @media (min-width: 768px) {
+    .show-tablet-up {
+      display: block;
+    }
+  }
+  
+  .show-desktop-up {
+    display: none;
+  }
+  
+  @media (min-width: 1024px) {
+    .show-desktop-up {
+      display: block;
+    }
+  }
+  
+  .hide-desktop {
+    display: block;
+  }
+  
+  @media (min-width: 1024px) {
+    .hide-desktop {
+      display: none;
+    }
+  }
+
+  /* ========================================
+     INTERACTIVE ELEMENTS
+     ======================================== */
+  
+  /* Touch-friendly tap targets */
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Hover effects that respect motion preferences */
+  .hover-lift {
+    transition: transform 0.2s ease;
+  }
+  
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .hover-lift:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
+  .hover-scale {
+    transition: transform 0.2s ease;
+  }
+  
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .hover-scale:hover {
+      transform: scale(1.05);
+    }
+  }
+  
+  .hover-glow {
+    transition: box-shadow 0.2s ease;
+  }
+  
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .hover-glow:hover {
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+    }
+  }
+
+  /* ========================================
+     SCROLL BEHAVIORS
+     ======================================== */
+  
+  /* Smooth scrolling with reduced motion support */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-smooth {
+      scroll-behavior: auto;
+    }
+  }
+  
+  /* Scroll snap utilities */
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .scroll-snap-x::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scroll-snap-center {
+    scroll-snap-align: center;
+  }
+  
+  .scroll-snap-start {
+    scroll-snap-align: start;
+  }
+
+  /* ========================================
+     PERFORMANCE OPTIMIZATIONS
+     ======================================== */
+  
+  /* GPU acceleration for animations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  /* Contain layout for better performance */
+  .contain-layout {
+    contain: layout;
+  }
+  
+  .contain-paint {
+    contain: paint;
+  }
+  
+  .contain-strict {
+    contain: strict;
+  }
+  
+  /* Optimize for animations */
+  .animate-optimized {
+    will-change: transform, opacity;
+  }
+  
+  .animate-optimized.animation-done {
+    will-change: auto;
+  }
+
+  /* ========================================
+     ACCESSIBILITY UTILITIES
+     ======================================== */
+  
+  /* Focus indicators */
+  .focus-ring-brand {
+    @apply focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-offset-2;
+  }
+  
+  .focus-ring-inset {
+    @apply focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 focus-visible:ring-inset;
+  }
+  
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .contrast-border {
+      border: 2px solid currentColor;
+    }
+    
+    .contrast-outline {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+  }
+  
+  /* Reduced motion alternatives */
+  @media (prefers-reduced-motion: reduce) {
+    .motion-safe\:animate-none {
+      animation: none !important;
+    }
+    
+    .motion-safe\:transition-none {
+      transition: none !important;
+    }
+    
+    .motion-safe\:transform-none {
+      transform: none !important;
+    }
+  }
+
+  /* ========================================
+     PRINT UTILITIES
+     ======================================== */
+  
+  @media print {
+    .print-hidden {
+      display: none !important;
+    }
+    
+    .print-visible {
+      display: block !important;
+    }
+    
+    .print-break-before {
+      page-break-before: always;
+    }
+    
+    .print-break-after {
+      page-break-after: always;
+    }
+    
+    .print-break-avoid {
+      page-break-inside: avoid;
+    }
+    
+    .print-no-shadows {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+    
+    .print-black-text {
+      color: black !important;
+    }
+    
+    .print-white-bg {
+      background: white !important;
+    }
+  }
+
+  /* ========================================
+     DARK MODE UTILITIES
+     ======================================== */
+  
+  @media (prefers-color-scheme: dark) {
+    .dark\:bg-dark {
+      background-color: #0f172a;
+    }
+    
+    .dark\:text-light {
+      color: #f8fafc;
+    }
+    
+    .dark\:border-dark {
+      border-color: #475569;
+    }
+  }
+
+  /* ========================================
+     COMPONENT-SPECIFIC UTILITIES
+     ======================================== */
+  
+  /* Card components */
+  .card-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .card-shadow:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  /* Button variants */
+  .btn-primary {
+    @apply bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 focus-ring-brand;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-blue-600 border-2 border-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-blue-600 hover:text-white transition-all duration-200 focus-ring-brand;
+  }
+  
+  .btn-outline {
+    @apply bg-transparent text-gray-700 border-2 border-gray-300 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-200 focus-ring-brand;
+  }
+  
+  /* Form components */
+  .input-field {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-200;
+  }
+  
+  .input-error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+  }
+  
+  .input-success {
+    @apply border-green-500 focus:border-green-500 focus:ring-green-200;
+  }
+  
+  /* Loading states */
+  .loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading-skeleton 1.5s infinite ease-in-out;
+  }
+  
+  @keyframes loading-skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  .loading-spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* ========================================
+     RESPONSIVE BREAKPOINT INDICATORS
+     ======================================== */
+  
+  /* Development utility to show current breakpoint */
+  .breakpoint-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    z-index: 9999;
+    font-family: monospace;
+  }
+  
+  .breakpoint-indicator::before {
+    content: 'xs';
+  }
+  
+  @media (min-width: 640px) {
+    .breakpoint-indicator::before {
+      content: 'sm';
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .breakpoint-indicator::before {
+      content: 'md';
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .breakpoint-indicator::before {
+      content: 'lg';
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .breakpoint-indicator::before {
+      content: 'xl';
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    .breakpoint-indicator::before {
+      content: '2xl';
+    }
+  }
+}
+
+/* ========================================
+   RESPONSIVE COMPONENT VARIANTS
+   ======================================== */
+
+@layer components {
+  /* Hero section responsive utilities */
+  .hero-section {
+    @apply relative py-16 md:py-24 lg:py-32 overflow-hidden;
+  }
+  
+  .hero-content {
+    @apply container-fluid relative z-10;
+  }
+  
+  .hero-title {
+    @apply text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-center mb-6;
+  }
+  
+  .hero-subtitle {
+    @apply text-lg md:text-xl lg:text-2xl text-center mb-8 max-w-4xl mx-auto;
+  }
+  
+  /* Section spacing */
+  .section {
+    @apply py-12 md:py-16 lg:py-24;
+  }
+  
+  .section-header {
+    @apply text-center mb-12 md:mb-16;
+  }
+  
+  .section-title {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold mb-6;
+  }
+  
+  .section-subtitle {
+    @apply text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto;
+  }
+  
+  /* Card components responsive design */
+  .card {
+    @apply bg-white rounded-xl p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-200;
+  }
+  
+  .card-header {
+    @apply mb-4 md:mb-6;
+  }
+  
+  .card-title {
+    @apply text-xl md:text-2xl font-bold mb-2;
+  }
+  
+  .card-content {
+    @apply space-y-4;
+  }
+  
+  /* Navigation components */
+  .nav-link {
+    @apply px-3 py-2 md:px-4 md:py-2 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-100 focus-ring-brand;
+  }
+  
+  .nav-button {
+    @apply px-6 py-2 md:px-8 md:py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 focus-ring-brand;
+  }
+  
+  /* Form layouts */
+  .form-group {
+    @apply space-y-2 mb-4 md:mb-6;
+  }
+  
+  .form-row {
+    @apply flex flex-col md:flex-row gap-4 md:gap-6;
+  }
+  
+  .form-row > * {
+    @apply flex-1;
+  }
+}
+
+/* ========================================
+   UTILITY CLASS COMBINATIONS
+   ======================================== */
+
+/* Common component patterns */
+.cta-section {
+  @apply section bg-gradient-to-r from-blue-50 to-purple-50 text-center;
+}
+
+.feature-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12;
+}
+
+.testimonial-card {
+  @apply card text-center transform hover:scale-105 transition-transform duration-200;
+}
+
+.gallery-item {
+  @apply aspect-responsive rounded-xl overflow-hidden hover-scale;
+}
+
+.pricing-card {
+  @apply card text-center relative overflow-hidden hover:shadow-2xl;
+}
+
+.stats-item {
+  @apply text-center;
+}
+
+.stats-number {
+  @apply text-3xl md:text-4xl lg:text-5xl font-bold text-blue-600 mb-2;
+}
+
+.stats-label {
+  @apply text-sm md:text-base text-gray-600 font-medium;
+}

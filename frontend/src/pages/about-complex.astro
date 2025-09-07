@@ -1,0 +1,401 @@
+---
+// About page - comprehensive studio information and values
+import Layout from '../layouts/Layout.astro'
+import StudioInfo from '../components/StudioInfo.astro'
+import InstructorProfile from '../components/InstructorProfile.astro'
+import PhotoGallery from '../components/PhotoGallery.astro'
+import { getStudioInfo } from '../services/studioService'
+import { getInstructors } from '../services/instructorService'
+import { getFeaturedPhotos } from '../services/photoService'
+
+// Fetch all required data with fallback handling
+let studioData, instructors, studioPhotos
+
+try {
+  const results = await Promise.allSettled([
+    getStudioInfo({ preview: false }),
+    getInstructors({ preview: false }),
+    getFeaturedPhotos({ preview: false, limit: 12 })
+  ])
+  
+  studioData = results[0].status === 'fulfilled' ? results[0].value : null
+  instructors = results[1].status === 'fulfilled' ? results[1].value : []
+  studioPhotos = results[2].status === 'fulfilled' ? results[2].value : []
+} catch (error) {
+  console.error('Error fetching about page data:', error)
+  studioData = null
+  instructors = []
+  studioPhotos = []
+}
+
+// Page metadata
+const pageTitle = `About ${studioData?.name || 'Our Studio'} - Your Journey to Wellness`
+const pageDescription = studioData?.description || 'Learn about our yoga studio, experienced instructors, and commitment to helping you discover inner peace and physical wellness through mindful movement.'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/about"
+>
+  <main class="about-page">
+    <!-- Hero Section with Studio Overview -->
+    <section class="hero-section bg-gradient-to-b from-slate-50 to-white py-16 md:py-24">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
+            About {studioData?.name || 'Our Studio'}
+          </h1>
+          <p class="text-xl md:text-2xl text-slate-600 leading-relaxed max-w-4xl mx-auto">
+            {studioData?.description || 'Discover a space dedicated to nurturing your mind, body, and spirit through the ancient practice of yoga.'}
+          </p>
+        </div>
+        
+        <!-- Studio Information Component -->
+        <div class="mb-16">
+          <StudioInfo 
+            variant="detailed"
+            className="bg-white rounded-2xl shadow-lg"
+            showFullDetails={true}
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section class="story-section py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div class="order-2 lg:order-1">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+              Our Story
+            </h2>
+            <div class="prose prose-lg text-slate-600 space-y-6">
+              <p>
+                Founded with a vision to create an inclusive and welcoming space for all yoga practitioners, 
+                our studio has been serving the community for over a decade. We believe that yoga is for 
+                everyone, regardless of age, experience level, or physical ability.
+              </p>
+              <p>
+                Our journey began when our founder recognized the transformative power of yoga and wanted 
+                to share this ancient practice with others. What started as a small studio has grown into 
+                a vibrant community of practitioners who support and inspire each other.
+              </p>
+              <p>
+                We're committed to maintaining an authentic approach to yoga while making it accessible 
+                to modern lifestyles. Our classes blend traditional teachings with contemporary understanding 
+                of anatomy and wellness.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Studio Photos Gallery Preview -->
+          <div class="order-1 lg:order-2">
+            {studioPhotos && studioPhotos.length > 0 && (
+              <div class="grid grid-cols-2 gap-4 rounded-2xl overflow-hidden shadow-lg">
+                {studioPhotos.slice(0, 4).map((photo) => (
+                  <div class="aspect-square bg-slate-100">
+                    <img 
+                      src={photo.sizes.medium}
+                      alt={photo.alt || 'Studio interior'}
+                      class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Values Section -->
+    <section class="values-section py-16 bg-slate-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Our Values
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            The principles that guide everything we do and create the foundation of our community.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Inclusivity -->
+          <div class="value-card bg-white rounded-xl p-8 shadow-lg text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Inclusivity</h3>
+            <p class="text-slate-600">
+              We welcome all bodies, all backgrounds, and all levels. Yoga is for everyone, and everyone belongs here.
+            </p>
+          </div>
+
+          <!-- Authenticity -->
+          <div class="value-card bg-white rounded-xl p-8 shadow-lg text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Authenticity</h3>
+            <p class="text-slate-600">
+              We honor the ancient traditions of yoga while adapting practices for modern life and understanding.
+            </p>
+          </div>
+
+          <!-- Growth -->
+          <div class="value-card bg-white rounded-xl p-8 shadow-lg text-center md:col-span-2 lg:col-span-1">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Growth</h3>
+            <p class="text-slate-600">
+              We support each student's unique journey, celebrating progress over perfection.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meet Our Instructors Section -->
+    <section class="instructors-section py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Meet Our Instructors
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Our experienced and passionate teachers are here to guide you on your yoga journey.
+          </p>
+        </div>
+
+        {instructors && instructors.length > 0 ? (
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {instructors.map((instructor) => (
+              <InstructorProfile 
+                instructor={instructor}
+                variant="card"
+                className="h-full"
+                key={instructor._id}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-12">
+            <p class="text-slate-500 text-lg">
+              Meet our amazing instructors - information coming soon!
+            </p>
+          </div>
+        )}
+
+        <!-- CTA to Instructors Page -->
+        {instructors && instructors.length > 0 && (
+          <div class="text-center mt-12">
+            <a 
+              href="/instructors" 
+              class="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+            >
+              View All Instructors
+              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Studio Space Section -->
+    <section class="space-section py-16 bg-slate-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Our Studio Space
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Step into our thoughtfully designed space that promotes peace, focus, and connection.
+          </p>
+        </div>
+
+        {studioPhotos && studioPhotos.length > 0 && (
+          <PhotoGallery 
+            photos={studioPhotos}
+            layout="masonry"
+            showFilters={false}
+            showLoadMore={false}
+            className="mb-8"
+          />
+        )}
+
+        <!-- Studio Amenities -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+          <div class="amenity-item text-center p-6 bg-white rounded-xl shadow-lg">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-2">Changing Rooms</h4>
+            <p class="text-sm text-slate-600">Clean, spacious facilities with lockers</p>
+          </div>
+
+          <div class="amenity-item text-center p-6 bg-white rounded-xl shadow-lg">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-2">Yoga Props</h4>
+            <p class="text-sm text-slate-600">Mats, blocks, straps, and bolsters</p>
+          </div>
+
+          <div class="amenity-item text-center p-6 bg-white rounded-xl shadow-lg">
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-2">Natural Light</h4>
+            <p class="text-sm text-slate-600">Floor-to-ceiling windows</p>
+          </div>
+
+          <div class="amenity-item text-center p-6 bg-white rounded-xl shadow-lg">
+            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-slate-900 mb-2">Community</h4>
+            <p class="text-sm text-slate-600">Welcoming space for connection</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Getting Started Section -->
+    <section class="getting-started-section py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-4xl text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+          Ready to Begin Your Journey?
+        </h2>
+        <p class="text-xl text-slate-600 mb-12 max-w-2xl mx-auto">
+          Join our welcoming community and discover the transformative power of yoga. 
+          We're here to support you every step of the way.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <a 
+            href="/membership" 
+            class="flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+          >
+            View Membership Plans
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+          </a>
+
+          <a 
+            href="/contact" 
+            class="flex items-center justify-center px-8 py-4 border-2 border-slate-900 text-slate-900 font-semibold rounded-full hover:bg-slate-900 hover:text-white transition-all duration-200"
+          >
+            Contact Us
+            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About {studioData?.name || 'Our Yoga Studio'}",
+    "description": "{pageDescription}",
+    "url": "{Astro.url.href}",
+    "mainEntity": {
+      "@type": "YogaStudio",
+      "name": "{studioData?.name || 'Yoga Studio'}",
+      "description": "{studioData?.description || pageDescription}",
+      "address": studioData?.address ? {
+        "@type": "PostalAddress",
+        "streetAddress": "{studioData.address.street}",
+        "addressLocality": "{studioData.address.city}",
+        "addressRegion": "{studioData.address.state}",
+        "postalCode": "{studioData.address.zipCode}"
+      } : undefined,
+      "telephone": "{studioData?.phone}",
+      "email": "{studioData?.email}",
+      "url": "{studioData?.website || Astro.site}",
+      "openingHoursSpecification": studioData?.hours ? Object.entries(studioData.hours).map(([day, schedule]) => ({
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": day.charAt(0).toUpperCase() + day.slice(1),
+        "opens": schedule.open,
+        "closes": schedule.close
+      })) : []
+    }
+  }
+  </script>
+</Layout>
+
+<style>
+  .about-page {
+    @apply min-h-screen;
+  }
+
+  .hero-section {
+    @apply relative;
+  }
+
+  .hero-section::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-blue-50 via-transparent to-purple-50 opacity-30;
+  }
+
+  .value-card {
+    @apply transform hover:scale-105 transition-transform duration-200;
+  }
+
+  .amenity-item {
+    @apply transform hover:scale-105 transition-transform duration-200;
+  }
+
+  /* Responsive typography */
+  @media (max-width: 768px) {
+    .about-page h1 {
+      @apply text-3xl;
+    }
+    
+    .about-page h2 {
+      @apply text-2xl;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .about-page {
+      @apply text-black bg-white;
+    }
+    
+    .hero-section,
+    .story-section,
+    .values-section,
+    .instructors-section,
+    .space-section,
+    .getting-started-section {
+      @apply shadow-none;
+    }
+  }
+</style>

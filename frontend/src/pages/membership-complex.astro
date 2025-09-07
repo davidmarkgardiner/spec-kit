@@ -1,0 +1,639 @@
+---
+// Membership page - pricing plans and membership information
+import Layout from '../layouts/Layout.astro'
+import MembershipCard from '../components/MembershipCard.astro'
+import StudioInfo from '../components/StudioInfo.astro'
+import ContactForm from '../components/ContactForm.astro'
+import { getMembershipPlans, getPlansGroupedByBillingCycle, getPopularPlans } from '../services/membershipService'
+import { getStudioInfo } from '../services/studioService'
+
+// Fetch all required data with fallback handling
+let studioData, allPlans, groupedPlans, popularPlans
+
+try {
+  const results = await Promise.allSettled([
+    getStudioInfo({ preview: false }),
+    getMembershipPlans({ preview: false }).catch(() => []),
+    getPlansGroupedByBillingCycle({ preview: false }).catch(() => ({})),
+    getPopularPlans({ preview: false })
+  ])
+  
+  studioData = results[0].status === 'fulfilled' ? results[0].value : null
+  allPlans = results[1].status === 'fulfilled' ? results[1].value : []
+  groupedPlans = results[2].status === 'fulfilled' ? results[2].value : {}
+  popularPlans = results[3].status === 'fulfilled' ? results[3].value : []
+} catch (error) {
+  console.error('Error fetching membership page data:', error)
+  studioData = null
+  allPlans = []
+  groupedPlans = {}
+  popularPlans = []
+}
+
+// Page metadata
+const pageTitle = `Membership Plans - ${studioData?.name || 'Yoga Studio'}`
+const pageDescription = 'Choose the perfect yoga membership plan for your lifestyle. Flexible options including monthly, annual, and drop-in rates with unlimited classes and exclusive benefits.'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/membership"
+>
+  <main class="membership-page">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient-to-br from-blue-50 via-white to-purple-50 py-16 md:py-24">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-16">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
+            Find Your Perfect Plan
+          </h1>
+          <p class="text-xl md:text-2xl text-slate-600 leading-relaxed max-w-4xl mx-auto mb-8">
+            Choose from flexible membership options designed to fit your lifestyle and yoga journey. 
+            All plans include access to our full range of classes and community events.
+          </p>
+          
+          <!-- Quick Benefits Overview -->
+          <div class="flex flex-wrap justify-center gap-6 text-slate-700">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>All Class Levels</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Expert Instructors</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Props Included</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Community Events</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Popular Plans Section -->
+    {popularPlans && popularPlans.length > 0 && (
+      <section class="popular-plans-section py-16 bg-white">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+              Most Popular Plans
+            </h2>
+            <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+              Our most-loved membership options that provide the best value and flexibility.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+            {popularPlans.slice(0, 3).map((plan) => (
+              <MembershipCard 
+                plan={plan}
+                variant="featured"
+                className="transform hover:scale-105 transition-transform duration-200"
+                showComparisonData={true}
+                key={plan._id}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- All Plans Section with Tabs -->
+    <section class="all-plans-section py-16 bg-slate-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            All Membership Options
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Explore all our membership plans and find the one that best fits your needs and budget.
+          </p>
+        </div>
+
+        <!-- Plan Category Tabs -->
+        <div class="flex flex-wrap justify-center mb-12" role="tablist">
+          <button 
+            class="tab-button active px-6 py-3 mx-2 mb-4 font-semibold rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            data-tab="monthly"
+            role="tab"
+            aria-selected="true"
+          >
+            Monthly Plans
+          </button>
+          <button 
+            class="tab-button px-6 py-3 mx-2 mb-4 font-semibold rounded-full bg-white text-slate-700 hover:bg-slate-100 transition-colors"
+            data-tab="annual"
+            role="tab"
+            aria-selected="false"
+          >
+            Annual Plans
+          </button>
+          <button 
+            class="tab-button px-6 py-3 mx-2 mb-4 font-semibold rounded-full bg-white text-slate-700 hover:bg-slate-100 transition-colors"
+            data-tab="dropin"
+            role="tab"
+            aria-selected="false"
+          >
+            Drop-in Rates
+          </button>
+        </div>
+
+        <!-- Monthly Plans -->
+        <div class="tab-content active" id="monthly" role="tabpanel">
+          {groupedPlans.monthly && groupedPlans.monthly.length > 0 ? (
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {groupedPlans.monthly.map((plan) => (
+                <MembershipCard 
+                  plan={plan}
+                  variant="standard"
+                  showComparisonData={true}
+                  key={plan._id}
+                />
+              ))}
+            </div>
+          ) : (
+            <div class="text-center py-12">
+              <p class="text-slate-500 text-lg">Monthly plans coming soon!</p>
+            </div>
+          )}
+        </div>
+
+        <!-- Annual Plans -->
+        <div class="tab-content hidden" id="annual" role="tabpanel">
+          {groupedPlans.annual && groupedPlans.annual.length > 0 ? (
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {groupedPlans.annual.map((plan) => (
+                <MembershipCard 
+                  plan={plan}
+                  variant="standard"
+                  showComparisonData={true}
+                  key={plan._id}
+                />
+              ))}
+            </div>
+          ) : (
+            <div class="text-center py-12">
+              <p class="text-slate-500 text-lg">Annual plans coming soon!</p>
+            </div>
+          )}
+
+          {groupedPlans.annual && groupedPlans.annual.length > 0 && (
+            <div class="mt-12 text-center">
+              <div class="bg-green-50 rounded-xl p-6 max-w-2xl mx-auto">
+                <h3 class="text-xl font-bold text-green-800 mb-2">Annual Plan Benefits</h3>
+                <p class="text-green-700">
+                  Save up to 20% with annual memberships and enjoy priority booking, 
+                  exclusive workshops, and guest passes.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <!-- Drop-in Plans -->
+        <div class="tab-content hidden" id="dropin" role="tabpanel">
+          {groupedPlans.dropIn && groupedPlans.dropIn.length > 0 ? (
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {groupedPlans.dropIn.map((plan) => (
+                <MembershipCard 
+                  plan={plan}
+                  variant="simple"
+                  showComparisonData={false}
+                  key={plan._id}
+                />
+              ))}
+            </div>
+          ) : (
+            <div class="text-center py-12">
+              <p class="text-slate-500 text-lg">Drop-in rates coming soon!</p>
+            </div>
+          )}
+
+          {groupedPlans.dropIn && groupedPlans.dropIn.length > 0 && (
+            <div class="mt-12 text-center">
+              <div class="bg-blue-50 rounded-xl p-6 max-w-2xl mx-auto">
+                <h3 class="text-xl font-bold text-blue-800 mb-2">Perfect for Trying Us Out</h3>
+                <p class="text-blue-700">
+                  Drop-in rates are ideal for first-time visitors or those with irregular schedules. 
+                  No commitment required!
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Membership Benefits Section -->
+    <section class="benefits-section py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            What's Included
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Every membership includes access to our full range of amenities and community.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Class Access -->
+          <div class="benefit-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">All Class Levels</h3>
+            <p class="text-slate-600">
+              From gentle beginner sessions to advanced vinyasa flows, 
+              access classes that match your skill level and goals.
+            </p>
+          </div>
+
+          <!-- Equipment -->
+          <div class="benefit-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Props & Equipment</h3>
+            <p class="text-slate-600">
+              Complimentary yoga mats, blocks, straps, and bolsters. 
+              Everything you need is provided and sanitized.
+            </p>
+          </div>
+
+          <!-- Community Events -->
+          <div class="benefit-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Community Events</h3>
+            <p class="text-slate-600">
+              Join workshops, meditation sessions, and social gatherings 
+              to deepen your practice and connect with fellow yogis.
+            </p>
+          </div>
+
+          <!-- Flexible Scheduling -->
+          <div class="benefit-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Flexible Scheduling</h3>
+            <p class="text-slate-600">
+              Book classes online 24/7, cancel up to 2 hours in advance, 
+              and access morning, afternoon, and evening sessions.
+            </p>
+          </div>
+
+          <!-- Personal Growth -->
+          <div class="benefit-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Personal Growth</h3>
+            <p class="text-slate-600">
+              Track your progress, set intentions, and work with instructors 
+              to achieve your wellness and flexibility goals.
+            </p>
+          </div>
+
+          <!-- Clean Facilities -->
+          <div class="benefit-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Clean Facilities</h3>
+            <p class="text-slate-600">
+              Pristine changing rooms, lockers, and practice space 
+              maintained with the highest hygiene standards.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section py-16 bg-slate-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-4xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Frequently Asked Questions
+          </h2>
+          <p class="text-xl text-slate-600">
+            Everything you need to know about our memberships and policies.
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          <!-- FAQ Item 1 -->
+          <div class="faq-item bg-white rounded-xl p-6 shadow-lg">
+            <button class="faq-question flex justify-between items-center w-full text-left" data-faq="q1">
+              <h3 class="text-lg font-bold text-slate-900">Can I freeze my membership?</h3>
+              <svg class="w-6 h-6 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden mt-4 text-slate-600">
+              <p>Yes! We understand life happens. You can freeze your membership for up to 3 months per year for medical reasons, travel, or other circumstances. Just give us 48 hours notice.</p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 2 -->
+          <div class="faq-item bg-white rounded-xl p-6 shadow-lg">
+            <button class="faq-question flex justify-between items-center w-full text-left" data-faq="q2">
+              <h3 class="text-lg font-bold text-slate-900">What if I need to cancel my membership?</h3>
+              <svg class="w-6 h-6 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden mt-4 text-slate-600">
+              <p>Monthly memberships can be cancelled with 30 days notice. Annual memberships have specific terms - please check your agreement or contact us for details. We're always happy to work with you to find a solution.</p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 3 -->
+          <div class="faq-item bg-white rounded-xl p-6 shadow-lg">
+            <button class="faq-question flex justify-between items-center w-full text-left" data-faq="q3">
+              <h3 class="text-lg font-bold text-slate-900">Do you offer student or senior discounts?</h3>
+              <svg class="w-6 h-6 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden mt-4 text-slate-600">
+              <p>Yes! We offer 15% discounts for students (with valid ID), seniors (65+), and military personnel. We also have need-based scholarships available - please speak with our front desk team.</p>
+            </div>
+          </div>
+
+          <!-- FAQ Item 4 -->
+          <div class="faq-item bg-white rounded-xl p-6 shadow-lg">
+            <button class="faq-question flex justify-between items-center w-full text-left" data-faq="q4">
+              <h3 class="text-lg font-bold text-slate-900">Can I bring guests?</h3>
+              <svg class="w-6 h-6 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden mt-4 text-slate-600">
+              <p>Annual members receive 2 guest passes per month. Monthly members can purchase guest passes for $20. First-time guests can attend one class free to try us out!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Have Questions?
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Our team is here to help you choose the perfect membership and get started on your yoga journey.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12 items-start">
+          <!-- Contact Form -->
+          <div>
+            <ContactForm 
+              formType="membership-inquiry"
+              variant="membership"
+              showSubjectOptions={true}
+              className="bg-slate-50 rounded-xl p-8"
+            />
+          </div>
+
+          <!-- Contact Info & Studio Hours -->
+          <div class="space-y-8">
+            <StudioInfo 
+              variant="contact"
+              className="bg-slate-50 rounded-xl p-8"
+              showFullDetails={true}
+            />
+
+            <!-- Quick Actions -->
+            <div class="bg-blue-50 rounded-xl p-6">
+              <h3 class="text-xl font-bold text-slate-900 mb-4">Ready to Get Started?</h3>
+              <div class="space-y-3">
+                <a 
+                  href="/contact" 
+                  class="flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+                >
+                  Schedule a Visit
+                  <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                  </svg>
+                </a>
+                
+                <p class="text-sm text-slate-600">
+                  Call us at {studioData?.phone} or visit during our open hours for a personal consultation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Yoga Studio Memberships",
+    "description": "{pageDescription}",
+    "provider": {
+      "@type": "YogaStudio",
+      "name": "{studioData?.name || 'Yoga Studio'}",
+      "address": studioData?.address ? {
+        "@type": "PostalAddress",
+        "streetAddress": "{studioData.address.street}",
+        "addressLocality": "{studioData.address.city}",
+        "addressRegion": "{studioData.address.state}",
+        "postalCode": "{studioData.address.zipCode}"
+      } : undefined,
+      "telephone": "{studioData?.phone}",
+      "email": "{studioData?.email}",
+      "url": "{studioData?.website || Astro.site}"
+    },
+    "offers": allPlans ? allPlans.map(plan => ({
+      "@type": "Offer",
+      "name": plan.name,
+      "description": plan.description,
+      "price": plan.price,
+      "priceCurrency": "USD",
+      "billingIncrement": plan.billingCycle === 'monthly' ? 'P1M' : plan.billingCycle === 'annual' ? 'P1Y' : 'P1D',
+      "category": "Yoga Membership"
+    })) : []
+  }
+  </script>
+</Layout>
+
+<style>
+  .membership-page {
+    @apply min-h-screen;
+  }
+
+  /* Tab Styles */
+  .tab-button.active {
+    @apply bg-blue-600 text-white;
+  }
+
+  .tab-content {
+    @apply transition-all duration-300;
+  }
+
+  .tab-content.active {
+    @apply block;
+  }
+
+  .tab-content.hidden {
+    @apply hidden;
+  }
+
+  /* Benefit Card Hover Effects */
+  .benefit-card {
+    @apply transform hover:scale-105 transition-all duration-200 hover:shadow-lg;
+  }
+
+  /* FAQ Styles */
+  .faq-question[data-expanded="true"] svg {
+    @apply rotate-180;
+  }
+
+  .faq-answer {
+    @apply transition-all duration-300 overflow-hidden;
+  }
+
+  .faq-answer.show {
+    @apply block;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .membership-page h1 {
+      @apply text-3xl;
+    }
+    
+    .membership-page h2 {
+      @apply text-2xl;
+    }
+
+    .tab-button {
+      @apply text-sm px-4 py-2;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    .membership-page {
+      @apply text-black bg-white;
+    }
+    
+    .hero-section,
+    .popular-plans-section,
+    .all-plans-section,
+    .benefits-section,
+    .faq-section,
+    .contact-section {
+      @apply shadow-none;
+    }
+
+    .tab-content {
+      @apply block !important;
+    }
+
+    .faq-answer {
+      @apply block !important;
+    }
+  }
+</style>
+
+<script>
+  // Tab functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button')
+    const tabContents = document.querySelectorAll('.tab-content')
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const targetTab = button.getAttribute('data-tab')
+        
+        // Remove active class from all buttons and contents
+        tabButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-blue-600', 'text-white')
+          btn.classList.add('bg-white', 'text-slate-700')
+          btn.setAttribute('aria-selected', 'false')
+        })
+        
+        tabContents.forEach(content => {
+          content.classList.remove('active')
+          content.classList.add('hidden')
+        })
+        
+        // Add active class to clicked button and corresponding content
+        button.classList.add('active', 'bg-blue-600', 'text-white')
+        button.classList.remove('bg-white', 'text-slate-700')
+        button.setAttribute('aria-selected', 'true')
+        
+        const targetContent = document.getElementById(targetTab)
+        if (targetContent) {
+          targetContent.classList.add('active')
+          targetContent.classList.remove('hidden')
+        }
+      })
+    })
+
+    // FAQ functionality
+    const faqQuestions = document.querySelectorAll('.faq-question')
+    
+    faqQuestions.forEach(question => {
+      question.addEventListener('click', () => {
+        const answer = question.nextElementSibling
+        const isExpanded = question.getAttribute('data-expanded') === 'true'
+        
+        // Close all other FAQs
+        faqQuestions.forEach(q => {
+          const otherAnswer = q.nextElementSibling
+          q.setAttribute('data-expanded', 'false')
+          otherAnswer.classList.add('hidden')
+          otherAnswer.classList.remove('show')
+        })
+        
+        // Toggle current FAQ
+        if (!isExpanded) {
+          question.setAttribute('data-expanded', 'true')
+          answer.classList.remove('hidden')
+          answer.classList.add('show')
+        }
+      })
+    })
+  })
+</script>

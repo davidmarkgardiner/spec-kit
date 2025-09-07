@@ -1,0 +1,32 @@
+---
+// Test page with Layout component but no service calls
+import Layout from '../layouts/Layout.astro'
+
+const pageTitle = 'Test Page - Serenity Yoga Studio'
+const pageDescription = 'Test page to verify components are working'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical={Astro.url.href}
+>
+  <div class="min-h-screen bg-gray-100 py-20">
+    <div class="container mx-auto px-4">
+      <h1 class="text-4xl font-bold text-gray-800 mb-8">Layout Test Page</h1>
+      <div class="bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Component Status:</h2>
+        <ul class="space-y-2">
+          <li class="text-green-600">✓ Layout component loading</li>
+          <li class="text-green-600">✓ Basic CSS working</li>
+          <li class="text-green-600">✓ Static content rendering</li>
+        </ul>
+        <div class="mt-8">
+          <button class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+            Test Button
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

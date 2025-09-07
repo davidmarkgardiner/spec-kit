@@ -1,0 +1,318 @@
+# Netlify Configuration for Yoga Studio Website
+# Comprehensive deployment and hosting configuration
+
+[build]
+  # Build command for Astro static site
+  command = "npm run build"
+  
+  # Directory to publish (Astro default output)
+  publish = "dist"
+  
+  # Functions directory for serverless functions
+  functions = "netlify/functions"
+  
+  # Environment variables available during build
+  environment = { NODE_VERSION = "18", NPM_VERSION = "9" }
+
+# Build processing settings
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+    
+    # Performance headers
+    X-DNS-Prefetch-Control = "on"
+    
+    # Cache control for general content
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Specific headers for HTML files
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Headers for static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers for images
+[[headers]]
+  for = "/*.{jpg,jpeg,png,gif,webp,avif,svg}"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers for fonts
+[[headers]]
+  for = "/*.{woff,woff2,ttf,otf,eot}"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
+
+# Headers for API routes (if any)
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Content Security Policy for enhanced security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = '''
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: blob: https: http:;
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://api.sanity.io https://*.sanity.io https://www.google-analytics.com;
+      frame-src 'self' https://www.youtube.com https://player.vimeo.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self' https://formspree.io;
+      upgrade-insecure-requests;
+    '''
+
+# Redirect rules for clean URLs and SEO
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/classes"
+  to = "/membership"
+  status = 301
+
+[[redirects]]
+  from = "/teachers"
+  to = "/instructors"
+  status = 301
+
+[[redirects]]
+  from = "/photos"
+  to = "/gallery"
+  status = 301
+
+[[redirects]]
+  from = "/contact-us"
+  to = "/contact"
+  status = 301
+
+# API proxy for Sanity (if needed)
+[[redirects]]
+  from = "/api/sanity/*"
+  to = "https://rwm8hvis.api.sanity.io/v2024-01-01/:splat"
+  status = 200
+
+# 404 fallback
+[[redirects]]
+  from = "/*"
+  to = "/404"
+  status = 404
+
+# Form handling configuration
+[forms]
+  # Enable Netlify Forms
+  enabled = true
+
+# Plugin configuration
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+  [plugins.inputs]
+    baseUrl = "https://yourdomain.com"
+    exclude = [
+      '/admin/**',
+      '/api/**'
+    ]
+
+# Environment-specific configurations
+[context.production]
+  command = "npm run build"
+  [context.production.environment]
+    NODE_ENV = "production"
+    HUGO_ENV = "production"
+
+[context.deploy-preview]
+  command = "npm run build"
+  [context.deploy-preview.environment]
+    NODE_ENV = "development"
+
+[context.branch-deploy]
+  command = "npm run build"
+  [context.branch-deploy.environment]
+    NODE_ENV = "development"
+
+# Function configurations (if using serverless functions)
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Edge functions configuration
+[edge_functions]
+  directory = "netlify/edge-functions"
+
+# Build hooks and notifications
+[notifications]
+  # Slack notification on successful deploys
+  [[notifications.email]]
+    event = "deploy-succeeded"
+    email = "admin@yourdomain.com"
+
+  [[notifications.email]]
+    event = "deploy-failed" 
+    email = "admin@yourdomain.com"
+
+# Performance optimizations
+[build.processing.skip_processing]
+  paths = [
+    "admin/**"
+  ]
+
+# Custom build settings for different branches
+[context.main]
+  command = "npm run build"
+  publish = "dist"
+
+[context.staging]
+  command = "npm run build:staging"
+  publish = "dist"
+
+# Image optimization settings
+[images]
+  # Enable automatic WebP conversion
+  auto_webp = true
+  
+  # Quality settings
+  quality = 85
+  
+  # Enable responsive images
+  responsive = true
+  
+  # Formats to generate
+  formats = ["webp", "avif", "auto"]
+
+# Large Media configuration (for Git LFS)
+[large_media]
+  # Automatically track common media file types
+  patterns = [
+    "*.jpg",
+    "*.jpeg", 
+    "*.png",
+    "*.gif",
+    "*.webp",
+    "*.mp4",
+    "*.mov",
+    "*.pdf"
+  ]
+
+# Analytics and monitoring
+[analytics]
+  # Enable Netlify Analytics
+  provider = "netlify"
+
+# Split testing configuration (A/B testing)
+[split_testing]
+  # Example split test configuration
+  [[split_testing.tests]]
+    path = "/"
+    branches = [
+      { branch = "main", percentage = 100 },
+      { branch = "variant-a", percentage = 0 }
+    ]
+
+# Custom domain and SSL settings
+[ssl]
+  # Force HTTPS redirects
+  force_ssl = true
+
+# Identity and authentication (if needed for admin)
+[identity]
+  # Enable Netlify Identity
+  enabled = false
+
+# Development settings
+[dev]
+  command = "npm run dev"
+  port = 4321
+  targetPort = 4321
+  publish = "dist"
+  autoLaunch = true
+
+# Branch-specific build settings
+[context.feature-branch]
+  command = "npm run build:preview"
+
+# Performance budgets and limits
+[build.limits]
+  # Build timeout in seconds
+  timeout = 900
+  
+  # Memory limit in MB
+  memory = 3000
+
+# Custom error pages
+[[error_pages]]
+  status = 404
+  path = "/404.html"
+
+[[error_pages]]
+  status = 500
+  path = "/500.html"
+
+# Prerendering configuration for SPA mode (if needed)
+[build.prerender]
+  # Paths to prerender
+  paths = [
+    "/",
+    "/about",
+    "/membership", 
+    "/instructors",
+    "/gallery",
+    "/contact",
+    "/404"
+  ]
+
+# Build plugins for optimization
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  [plugins.inputs]
+    output_path = "lighthouse"
+    
+[[plugins]]
+  package = "netlify-plugin-minify-html"
+
+[[plugins]]
+  package = "netlify-plugin-cache-nextjs"
+
+# Environment variable validation
+[build.environment]
+  # Required environment variables
+  SANITY_PROJECT_ID = { required = true }
+  SANITY_DATASET = { required = true }
+  PUBLIC_SITE_URL = { required = true }

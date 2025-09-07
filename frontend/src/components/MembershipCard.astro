@@ -1,0 +1,617 @@
+---
+// MembershipCard component - displays membership plan pricing and details
+// This component implements the contract from MembershipCard.test.ts
+export interface Props {
+  plan: {
+    name: string
+    description?: string
+    price: number
+    billingCycle: 'monthly' | 'annual' | 'drop-in'
+    duration?: number | null
+    classesIncluded?: number | null
+    benefits?: Array<string>
+    restrictions?: string | null
+    isPopular?: boolean
+    isActive?: boolean
+  }
+  className?: string
+  variant?: 'default' | 'compact' | 'full'
+  compareMode?: boolean
+  selected?: boolean
+  loading?: boolean
+  theme?: 'light' | 'dark'
+  onSelect?: (plan: any) => void
+}
+
+const { 
+  plan, 
+  className = '', 
+  variant = 'default',
+  compareMode = false,
+  selected = false,
+  loading = false,
+  theme = 'light',
+  onSelect
+} = Astro.props
+
+// Format price with commas for thousands
+const formatPrice = (price: number) => {
+  if (price === 0) return 'Free'
+  return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+// Format billing cycle text
+const formatBillingCycle = (cycle: string) => {
+  switch (cycle) {
+    case 'monthly': return 'per month'
+    case 'annual': return 'per year'
+    case 'drop-in': return 'per class'
+    default: return cycle
+  }
+}
+
+// Format classes included
+const formatClassesIncluded = (classesIncluded?: number | null) => {
+  if (!classesIncluded) return 'Unlimited classes'
+  return `${classesIncluded} class${classesIncluded > 1 ? 'es' : ''}`
+}
+
+// Calculate estimated price per class for unlimited plans
+const calculatePricePerClass = (price: number, cycle: string) => {
+  if (cycle === 'drop-in' || !price) return null
+  
+  // Estimate based on 4 classes per month
+  const estimatedClasses = cycle === 'monthly' ? 4 : 48
+  const pricePerClass = price / estimatedClasses
+  return `$${pricePerClass.toFixed(2)} per class`
+}
+
+// Generate unique ID for ARIA labelledby
+const planId = `plan-${plan.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`
+
+// Determine CTA text based on plan type
+const getCtaText = () => {
+  if (plan.isPopular) return 'Get Started'
+  if (plan.billingCycle === 'drop-in') return 'Book Class'
+  return 'Select Plan'
+}
+
+// Handle CTA click
+const handleCtaClick = () => {
+  if (onSelect && !loading) {
+    onSelect(plan)
+  }
+}
+---
+
+<div 
+  data-testid="membership-card" 
+  class={`membership-card ${variant} ${className} ${plan.isPopular ? 'popular' : ''} ${compareMode ? 'compare' : ''} ${selected ? 'selected' : ''} ${loading ? 'loading' : ''} ${theme} responsive mobile card`}
+  role="article"
+  aria-labelledby={planId}
+>
+  {plan.isPopular && (
+    <div data-testid="popular-badge" class="popular-badge">
+      <span class="badge-text">Most Popular</span>
+    </div>
+  )}
+
+  {compareMode && selected && (
+    <div data-testid="selection-indicator" class="selection-indicator">
+      ✓ Selected
+    </div>
+  )}
+
+  <div class="card-header">
+    <h3 data-testid="plan-name" id={planId} class="plan-name">
+      {plan.name}
+    </h3>
+    
+    <div class="price-section">
+      <span data-testid="plan-price" class="plan-price price">
+        {formatPrice(plan.price)}
+      </span>
+      <span data-testid="billing-cycle" class="billing-cycle">
+        {formatBillingCycle(plan.billingCycle)}
+      </span>
+    </div>
+
+    {calculatePricePerClass(plan.price, plan.billingCycle) && (
+      <div data-testid="price-per-class" class="price-per-class secondary small muted">
+        Est. {calculatePricePerClass(plan.price, plan.billingCycle)}
+      </div>
+    )}
+  </div>
+
+  <div class="card-content">
+    {plan.description && (
+      <p data-testid="plan-description" class="plan-description">
+        {plan.description}
+      </p>
+    )}
+
+    <div data-testid="classes-included" class="classes-included">
+      <strong>{formatClassesIncluded(plan.classesIncluded)}</strong>
+    </div>
+
+    {plan.duration && (
+      <div data-testid="plan-duration" class="plan-duration">
+        <strong>{plan.duration} month contract</strong>
+      </div>
+    )}
+
+    {plan.benefits && plan.benefits.length > 0 && (
+      <div data-testid="plan-benefits" class="plan-benefits">
+        <h4 class="benefits-title">What's Included:</h4>
+        <ul class="benefits-list">
+          {plan.benefits.map((benefit) => (
+            <li key={benefit} data-testid="benefit-item" class="benefit-item">
+              ✓ {benefit}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {plan.restrictions && (
+      <div data-testid="plan-restrictions" class="plan-restrictions">
+        <h5 class="restrictions-title">Terms & Conditions:</h5>
+        <p class="restrictions-text">{plan.restrictions}</p>
+      </div>
+    )}
+  </div>
+
+  <div class="card-footer">
+    <button 
+      data-testid="plan-cta"
+      class="plan-cta btn button cta"
+      aria-label={`${getCtaText()} - ${plan.name} membership plan`}
+      tabindex="0"
+      disabled={loading}
+      onclick={handleCtaClick}
+    >
+      {loading ? 'Loading...' : getCtaText()}
+    </button>
+  </div>
+</div>
+
+<style>
+.membership-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 400px;
+  min-height: 500px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.membership-card:hover {
+  border-color: #22c55e;
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.1);
+  transform: translateY(-2px);
+}
+
+.membership-card:focus-within {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+/* Popular plan styling */
+.membership-card.popular {
+  border-color: #22c55e;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.15);
+  background: linear-gradient(135deg, #f0fdf4 0%, white 100%);
+}
+
+.membership-card.popular::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0 1rem 0 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* Compare mode styling */
+.membership-card.compare {
+  border-width: 3px;
+}
+
+.membership-card.selected {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, white 100%);
+}
+
+.selection-indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #3b82f6;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Loading state */
+.membership-card.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.membership-card.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Card sections */
+.card-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.plan-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+}
+
+.price-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.plan-price {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #22c55e;
+  line-height: 1;
+}
+
+.billing-cycle {
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.price-per-class {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.plan-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0;
+  text-align: center;
+}
+
+.classes-included {
+  text-align: center;
+  font-size: 1.125rem;
+  color: #374151;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.plan-duration {
+  text-align: center;
+  font-size: 1rem;
+  color: #374151;
+  padding: 0.75rem;
+  background: #fef3c7;
+  border-radius: 0.5rem;
+  border: 1px solid #fbbf24;
+}
+
+.plan-benefits {
+  flex: 1;
+}
+
+.benefits-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 1rem 0;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.benefit-item::before {
+  content: '✓';
+  color: #22c55e;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.plan-restrictions {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 1rem;
+}
+
+.restrictions-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.restrictions-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.card-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.plan-cta {
+  width: 100%;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 1rem 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px; /* Touch target */
+  position: relative;
+  overflow: hidden;
+}
+
+.plan-cta:hover:not(:disabled) {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.plan-cta:focus {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
+.plan-cta:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.plan-cta:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Popular plan CTA styling */
+.membership-card.popular .plan-cta {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+}
+
+.membership-card.popular .plan-cta:hover:not(:disabled) {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+}
+
+/* Variant styling */
+.membership-card.compact {
+  padding: 1.5rem;
+  min-height: 400px;
+}
+
+.membership-card.compact .plan-name {
+  font-size: 1.5rem;
+}
+
+.membership-card.compact .plan-price {
+  font-size: 2.5rem;
+}
+
+/* Theme styling */
+.membership-card.dark {
+  background: #1f2937;
+  border-color: #374151;
+  color: white;
+}
+
+.membership-card.dark .plan-name {
+  color: white;
+}
+
+.membership-card.dark .plan-description {
+  color: #d1d5db;
+}
+
+.membership-card.dark .classes-included {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+/* Free plan styling */
+.plan-price:has-text("Free") {
+  color: #059669;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .membership-card {
+    padding: 1.5rem;
+    margin: 0 1rem;
+    max-width: none;
+  }
+  
+  .plan-name {
+    font-size: 1.5rem;
+  }
+  
+  .plan-price {
+    font-size: 2.5rem;
+  }
+  
+  .plan-cta {
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .membership-card:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* Print styles */
+@media print {
+  .membership-card {
+    border: 2px solid #000;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  
+  .popular-badge {
+    background: #000;
+    color: white;
+  }
+  
+  .plan-cta {
+    background: #000;
+    color: white;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .membership-card {
+    border-color: #000;
+  }
+  
+  .plan-price {
+    color: #000;
+  }
+  
+  .plan-cta {
+    background: #000;
+    border: 2px solid #000;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .membership-card,
+  .plan-cta {
+    transition: none;
+  }
+  
+  .membership-card:hover {
+    transform: none;
+  }
+  
+  .shimmer {
+    animation: none;
+  }
+}
+
+/* Focus visible */
+.plan-cta:focus-visible {
+  outline: 3px solid #22c55e;
+  outline-offset: 2px;
+}
+</style>
+
+<script>
+// Handle keyboard navigation
+document.addEventListener('DOMContentLoaded', () => {
+  const ctaButtons = document.querySelectorAll('[data-testid="plan-cta"]');
+  
+  ctaButtons.forEach(button => {
+    button.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        button.click();
+      }
+    });
+  });
+});
+</script>

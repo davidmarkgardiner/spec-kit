@@ -1,0 +1,406 @@
+---
+// Simple Contact page
+import Layout from '../layouts/Layout.astro'
+
+const pageTitle = 'Contact Us - Serenity Yoga Studio'
+const pageDescription = 'Get in touch with our yoga studio. Visit us, call, email, or use our contact form to ask questions about classes, memberships, and our programs.'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/contact"
+>
+  <main class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-blue-50 to-white py-20">
+      <div class="container mx-auto px-4 max-w-6xl text-center">
+        <h1 class="text-5xl font-bold text-gray-800 mb-6">Get in Touch</h1>
+        <p class="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+          We're here to help with questions, class schedules, membership information, 
+          or anything else you'd like to know about our yoga community.
+        </p>
+      </div>
+    </section>
+
+    <!-- Contact Information -->
+    <section class="py-16">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="grid lg:grid-cols-2 gap-16">
+          <!-- Contact Form -->
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Send Us a Message</h2>
+            <p class="text-lg text-gray-600 mb-8">
+              Have a question or want to learn more? Fill out the form below and we'll get back to you as soon as possible.
+            </p>
+            
+            <form class="space-y-6" id="contact-form">
+              <div class="bg-gray-100 rounded-lg p-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-6">Contact Us</h3>
+                <p class="text-gray-600 mb-8">Have questions about classes, schedules, or our studio? We'd love to hear from you.</p>
+                
+                <div class="space-y-6">
+                  <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                    <input 
+                      type="text" 
+                      id="name" 
+                      name="name" 
+                      required 
+                      placeholder="Enter your first and last name"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <div class="text-red-500 text-sm mt-1 hidden" id="name-error">Name is required</div>
+                  </div>
+                  
+                  <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      name="email" 
+                      required 
+                      placeholder="your.email@example.com"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <div class="text-red-500 text-sm mt-1 hidden" id="email-error">Email address is required</div>
+                  </div>
+                  
+                  <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                    <textarea 
+                      id="message" 
+                      name="message" 
+                      required 
+                      rows="5" 
+                      placeholder="Tell us how we can help you on your yoga journey..."
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    ></textarea>
+                    <div class="text-red-500 text-sm mt-1 hidden" id="message-error">Message is required</div>
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  >
+                    Send Message
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Response Time Notice -->
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 flex items-start">
+              <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <h4 class="text-sm font-semibold text-blue-800 mb-1">Response Time</h4>
+                <p class="text-sm text-blue-700">
+                  We typically respond to all inquiries within 24 hours during business days. 
+                  For urgent matters, please call us directly.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Studio Information -->
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Visit Our Studio</h2>
+            <p class="text-lg text-gray-600 mb-8">
+              We'd love to welcome you to our studio in person. Here's everything you need to know for your visit.
+            </p>
+
+            <!-- Contact Details -->
+            <div class="bg-gray-100 rounded-lg p-8 mb-8">
+              <h3 class="text-xl font-semibold text-gray-800 mb-6">Studio Information</h3>
+              
+              <div class="space-y-6">
+                <!-- Address -->
+                <div class="flex items-start">
+                  <svg class="w-6 h-6 text-gray-500 mt-1 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <div>
+                    <h4 class="font-semibold text-gray-800">Address</h4>
+                    <p class="text-gray-600">
+                      123 Wellness Way<br>
+                      Mindful Valley, CA 90210
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="flex items-start">
+                  <svg class="w-6 h-6 text-gray-500 mt-1 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
+                  <div>
+                    <h4 class="font-semibold text-gray-800">Phone</h4>
+                    <a href="tel:(555) 123-YOGA" class="text-blue-600 hover:text-blue-800 transition-colors">
+                      (555) 123-YOGA
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="flex items-start">
+                  <svg class="w-6 h-6 text-gray-500 mt-1 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  <div>
+                    <h4 class="font-semibold text-gray-800">Email</h4>
+                    <a href="mailto:hello@serenityyoga.com" class="text-blue-600 hover:text-blue-800 transition-colors">
+                      hello@serenityyoga.com
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Hours -->
+                <div class="flex items-start">
+                  <svg class="w-6 h-6 text-gray-500 mt-1 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <div>
+                    <h4 class="font-semibold text-gray-800">Studio Hours</h4>
+                    <div class="text-gray-600 space-y-1">
+                      <p>Monday - Friday: 6:00 AM - 9:00 PM</p>
+                      <p>Saturday - Sunday: 7:00 AM - 8:00 PM</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- First Visit Information -->
+            <div class="bg-green-50 rounded-lg p-6 border border-green-200">
+              <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                First Time Visiting?
+              </h3>
+              <div class="space-y-3 text-gray-700">
+                <p>
+                  <strong>Arrive Early:</strong> Please arrive 10-15 minutes before your first class 
+                  to complete a brief intake form and get oriented.
+                </p>
+                <p>
+                  <strong>What to Bring:</strong> Just yourself and a water bottle. We provide mats, 
+                  blocks, straps, and other props.
+                </p>
+                <p>
+                  <strong>What to Wear:</strong> Comfortable clothing that allows you to move freely. 
+                  We have changing rooms if needed.
+                </p>
+                <p>
+                  <strong>Free First Class:</strong> Your first drop-in class is completely free - 
+                  no strings attached!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h2>
+          <p class="text-xl text-gray-600">Quick answers to common questions about visiting our studio.</p>
+        </div>
+
+        <div class="space-y-6">
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">Do I need to book classes in advance?</h3>
+            <p class="text-gray-600">
+              While we welcome walk-ins when space allows, we highly recommend booking classes in advance to guarantee your spot. 
+              You can book online through our website or call us directly.
+            </p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">What should I expect in my first class?</h3>
+            <p class="text-gray-600">
+              Your first class will be welcoming and accessible! Please let the instructor know you're new - they'll provide 
+              extra guidance and modifications. We encourage you to listen to your body and ask questions.
+            </p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">What if I have injuries or physical limitations?</h3>
+            <p class="text-gray-600">
+              Please inform your instructor about any injuries or limitations before class. Our teachers are trained to offer 
+              modifications and alternatives for nearly every pose. Yoga should be accessible to every body.
+            </p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">Do you offer private classes?</h3>
+            <p class="text-gray-600">
+              Yes! We offer private one-on-one sessions and semi-private classes for 2-3 people. Private sessions are great 
+              for beginners or students with specific goals. Contact us to discuss scheduling and rates.
+            </p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-3">Can I purchase gift certificates?</h3>
+            <p class="text-gray-600">
+              Absolutely! Gift certificates are available for single classes, class packages, or membership plans. 
+              You can purchase them in person at the studio or contact us to arrange payment and delivery.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="py-16 bg-gray-100">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-6">Find Us</h2>
+          <p class="text-xl text-gray-600">Located in the heart of Mindful Valley, we're easy to find and access.</p>
+        </div>
+
+        <!-- Map Placeholder -->
+        <div class="bg-gray-200 rounded-lg h-96 flex items-center justify-center mb-8">
+          <div class="text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <h3 class="text-xl font-bold text-gray-700 mb-2">Interactive Map</h3>
+            <p class="text-gray-500 mb-4">Map integration coming soon</p>
+            <a 
+              href="https://maps.google.com/?q=123+Wellness+Way,+Mindful+Valley,+CA+90210"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              View on Google Maps
+              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Location Details -->
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-lg p-6 text-center shadow-lg">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-800 mb-2">Address</h4>
+            <p class="text-sm text-gray-600">
+              123 Wellness Way<br>
+              Mindful Valley, CA 90210
+            </p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 text-center shadow-lg">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-800 mb-2">Parking</h4>
+            <p class="text-sm text-gray-600">
+              Free street parking<br>
+              Nearby parking garage
+            </p>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 text-center shadow-lg">
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-800 mb-2">Transit</h4>
+            <p class="text-sm text-gray-600">
+              Bus Routes 15 & 22<br>
+              Bike racks available
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-16 bg-blue-600 text-white">
+      <div class="container mx-auto px-4 max-w-4xl text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
+        <p class="text-xl mb-8 opacity-90">
+          Whether you're a complete beginner or experienced practitioner, we can't wait to welcome you to our community.
+        </p>
+        <div class="flex justify-center space-x-4 flex-wrap gap-4">
+          <a href="/membership" class="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+            View Classes & Pricing
+          </a>
+          <a href="tel:(555) 123-YOGA" class="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-blue-600 transition-colors font-semibold">
+            Call Us Now
+          </a>
+        </div>
+        <div class="mt-6 text-blue-100">
+          <p class="text-sm">
+            <strong>Free First Class:</strong> New students receive their first drop-in class completely free!
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Form validation and submission
+  const form = document.getElementById('contact-form')
+  const nameField = document.getElementById('name')
+  const emailField = document.getElementById('email')
+  const messageField = document.getElementById('message')
+  
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault()
+      
+      let isValid = true
+      
+      // Reset errors
+      document.querySelectorAll('[id$="-error"]').forEach(error => {
+        error.classList.add('hidden')
+      })
+      
+      // Validate name
+      if (!nameField.value.trim()) {
+        document.getElementById('name-error').classList.remove('hidden')
+        isValid = false
+      }
+      
+      // Validate email
+      if (!emailField.value.trim()) {
+        document.getElementById('email-error').classList.remove('hidden')
+        isValid = false
+      }
+      
+      // Validate message
+      if (!messageField.value.trim()) {
+        document.getElementById('message-error').classList.remove('hidden')
+        isValid = false
+      }
+      
+      if (isValid) {
+        // Show success message (in a real app, this would submit to a server)
+        alert('Thank you for your message! We\'ll get back to you within 24 hours.')
+        form.reset()
+      }
+    })
+  }
+})
+</script>

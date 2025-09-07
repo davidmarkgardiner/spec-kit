@@ -1,0 +1,151 @@
+---
+// Simple Gallery page
+import Layout from '../layouts/Layout.astro'
+
+const pageTitle = 'Studio Gallery - Serenity Yoga Studio'
+const pageDescription = 'Take a virtual tour of our beautiful yoga studio. See our spacious practice rooms, peaceful environment, and welcoming community in action.'
+
+// Static gallery data organized by category
+const galleryCategories = [
+  {
+    id: 'studio-space',
+    name: 'Studio Spaces',
+    description: 'Our beautiful, light-filled practice rooms designed for peace and mindfulness',
+    photos: [
+      { id: '1', title: 'Main Practice Room', alt: 'Spacious main yoga practice room with natural lighting' },
+      { id: '2', title: 'Meditation Corner', alt: 'Quiet meditation space with cushions and plants' },
+      { id: '3', title: 'Reception Area', alt: 'Welcoming reception and retail area' },
+      { id: '4', title: 'Changing Rooms', alt: 'Clean, comfortable changing facilities' },
+      { id: '5', title: 'Relaxation Space', alt: 'Peaceful area for pre and post-class relaxation' },
+      { id: '6', title: 'Workshop Room', alt: 'Intimate space for workshops and teacher training' }
+    ]
+  },
+  {
+    id: 'classes',
+    name: 'Classes in Action',
+    description: 'See our community in practice - all levels, all ages, all welcome',
+    photos: [
+      { id: '7', title: 'Morning Vinyasa', alt: 'Students flowing through morning vinyasa sequence' },
+      { id: '8', title: 'Restorative Class', alt: 'Peaceful restorative yoga session with props' },
+      { id: '9', title: 'Power Yoga', alt: 'Dynamic power yoga class building strength' },
+      { id: '10', title: 'Gentle Yoga', alt: 'Gentle yoga class with modifications and props' },
+      { id: '11', title: 'Meditation Session', alt: 'Group meditation in peaceful studio setting' },
+      { id: '12', title: 'Workshop', alt: 'Special workshop on alignment and breathwork' }
+    ]
+  },
+  {
+    id: 'community',
+    name: 'Our Community',
+    description: 'The heart of our studio - the wonderful people who practice with us',
+    photos: [
+      { id: '13', title: 'New Student Welcome', alt: 'Instructor helping new student with pose' },
+      { id: '14', title: 'Community Event', alt: 'Studio community gathering for special event' },
+      { id: '15', title: 'Teacher Training', alt: 'Aspiring teachers in certification program' },
+      { id: '16', title: 'Outdoor Practice', alt: 'Special outdoor yoga session in the park' },
+      { id: '17', title: 'Studio Anniversary', alt: 'Celebrating another year of community growth' },
+      { id: '18', title: 'Charity Class', alt: 'Special fundraising class for local charity' }
+    ]
+  }
+]
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/gallery"
+>
+  <main class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-green-50 to-white py-20">
+      <div class="container mx-auto px-4 max-w-6xl text-center">
+        <h1 class="text-5xl font-bold text-gray-800 mb-6">Studio Gallery</h1>
+        <p class="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+          Experience the peaceful atmosphere of our studio through these photos. 
+          See our beautiful spaces, vibrant classes, and the amazing community that makes our studio special.
+        </p>
+      </div>
+    </section>
+
+    <!-- Gallery Categories -->
+    <section class="py-16">
+      <div class="container mx-auto px-4 max-w-7xl">
+        {galleryCategories.map((category, categoryIndex) => (
+          <div class="mb-20 last:mb-0">
+            <!-- Category Header -->
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold text-gray-800 mb-4">{category.name}</h2>
+              <p class="text-lg text-gray-600 max-w-2xl mx-auto">{category.description}</p>
+            </div>
+            
+            <!-- Photo Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {category.photos.map((photo, photoIndex) => (
+                <div class="group cursor-pointer">
+                  <div class="relative overflow-hidden rounded-lg bg-gray-200 aspect-[4/3] mb-4 hover:shadow-lg transition-all duration-300">
+                    <!-- Placeholder for photo -->
+                    <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                      <div class="text-center">
+                        <div class="text-4xl mb-2">
+                          {category.id === 'studio-space' ? '🏢' : 
+                           category.id === 'classes' ? '🧘‍♀️' : '👥'}
+                        </div>
+                        <p class="text-gray-500 font-medium">{photo.title}</p>
+                      </div>
+                    </div>
+                    
+                    <!-- Hover Overlay -->
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                      <div class="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Photo Info -->
+                  <div class="text-center">
+                    <h3 class="font-semibold text-gray-800 mb-1">{photo.title}</h3>
+                    <p class="text-sm text-gray-600">{photo.alt}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Virtual Tour CTA -->
+    <section class="py-16 bg-green-600 text-white">
+      <div class="container mx-auto px-4 max-w-4xl text-center">
+        <h2 class="text-3xl font-bold mb-4">Want to See More?</h2>
+        <p class="text-xl mb-8 opacity-90">
+          The best way to experience our studio is in person. Come visit us for a tour or drop into a class!
+        </p>
+        <div class="flex justify-center space-x-4 flex-wrap gap-4">
+          <a href="/contact" class="bg-white text-green-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+            Schedule a Visit
+          </a>
+          <a href="/membership" class="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-green-600 transition-colors font-semibold">
+            Try a Class
+          </a>
+          <a href="tel:(555) 123-YOGA" class="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-green-600 transition-colors font-semibold">
+            Call for Info
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Photo Guidelines -->
+    <section class="py-12 bg-gray-100">
+      <div class="container mx-auto px-4 max-w-4xl text-center">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Photography at Our Studio</h3>
+        <p class="text-gray-600">
+          We love sharing the beauty of our practice! Photos may be taken during classes for promotional purposes. 
+          If you prefer not to be photographed, please let your instructor know before class begins.
+        </p>
+      </div>
+    </section>
+  </main>
+</Layout>

@@ -1,0 +1,108 @@
+---
+// Simple test page to verify everything works
+import SimpleLayout from '../layouts/SimpleLayout.astro'
+
+// Basic page metadata
+const pageTitle = 'Serenity Yoga Studio'
+const pageDescription = 'Find your inner peace at our welcoming yoga studio'
+---
+
+<SimpleLayout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical={Astro.url.href}
+>
+  <main class="min-h-screen bg-gradient-to-br from-gray-50 to-slate-50">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient-to-r from-gray-700 to-gray-800 text-white py-20">
+      <div class="container mx-auto px-4 text-center">
+        <h1 class="text-5xl font-bold mb-6">Find Your Inner Peace</h1>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">
+          Join our welcoming community of yogis in a space designed for growth, 
+          healing, and transformation. All levels welcome.
+        </p>
+        <div class="space-x-4">
+          <a href="#" class="bg-white text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Start Your Journey
+          </a>
+          <a href="#" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-gray-700 transition-colors">
+            Learn More
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Welcome Section -->
+    <section class="py-16">
+      <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to Serenity Yoga Studio</h2>
+            <p class="text-gray-600 mb-6">
+              Whether you're a complete beginner or an experienced practitioner, 
+              our studio offers a supportive environment where you can explore 
+              your practice at your own pace.
+            </p>
+            <p class="text-gray-600 mb-8">
+              Join us for a journey of self-discovery, strength, and serenity.
+            </p>
+            <a href="#" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+              Our Story
+            </a>
+          </div>
+          <div class="bg-gray-100 h-64 rounded-lg flex items-center justify-center">
+            <p class="text-gray-600 font-semibold">Studio Image Placeholder</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="bg-gray-50 py-16">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-12">Why Choose Our Studio</h2>
+        <div class="grid md:grid-cols-4 gap-8">
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <div class="text-4xl mb-4">🧘‍♀️</div>
+            <h3 class="font-semibold text-gray-800 mb-2">All Levels Welcome</h3>
+            <p class="text-gray-600 text-sm">From beginners to advanced practitioners</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <div class="text-4xl mb-4">🤝</div>
+            <h3 class="font-semibold text-gray-800 mb-2">Supportive Community</h3>
+            <p class="text-gray-600 text-sm">A welcoming space for everyone</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <div class="text-4xl mb-4">🌟</div>
+            <h3 class="font-semibold text-gray-800 mb-2">Experienced Teachers</h3>
+            <p class="text-gray-600 text-sm">Learn from certified instructors</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <div class="text-4xl mb-4">🏡</div>
+            <h3 class="font-semibold text-gray-800 mb-2">Welcoming Space</h3>
+            <p class="text-gray-600 text-sm">A peaceful sanctuary for practice</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-gray-700 text-white py-16">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to Begin Your Journey?</h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">
+          Join our community and discover the transformative power of yoga. 
+          New students receive a special welcome package.
+        </p>
+        <div class="space-x-4">
+          <a href="#" class="bg-white text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Get Started Today
+          </a>
+          <a href="#" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-gray-700 transition-colors">
+            Ask Questions
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</SimpleLayout>

@@ -1,0 +1,205 @@
+openapi: 3.0.0
+info:
+  title: Contact Form API
+  description: Netlify Forms API for yoga studio contact submissions
+  version: 1.0.0
+
+servers:
+  - url: https://studio-domain.netlify.app
+    description: Netlify hosting with form handling
+
+paths:
+  /contact:
+    post:
+      summary: Submit contact form
+      description: Submit general inquiry form to studio
+      operationId: submitContactForm
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContactFormData'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContactFormData'
+      responses:
+        '200':
+          description: Form submitted successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "Thank you for your inquiry! We'll get back to you within 24 hours."
+        '400':
+          description: Invalid form data
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "Please fill in all required fields."
+        '429':
+          description: Too many requests
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "Too many form submissions. Please try again later."
+
+  /membership-inquiry:
+    post:
+      summary: Submit membership inquiry
+      description: Submit membership-specific inquiry form
+      operationId: submitMembershipInquiry
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MembershipInquiryData'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MembershipInquiryData'
+      responses:
+        '200':
+          description: Membership inquiry submitted successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "Thank you for your interest! A membership specialist will contact you soon."
+        '400':
+          description: Invalid form data
+        '429':
+          description: Too many requests
+
+components:
+  schemas:
+    ContactFormData:
+      type: object
+      required:
+        - form-name
+        - name
+        - email
+        - message
+      properties:
+        form-name:
+          type: string
+          enum: [contact]
+          description: Netlify form identifier
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          pattern: '^[a-zA-Z\s\-\.]+$'
+          example: "Jane Doe"
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: "jane.doe@example.com"
+        phone:
+          type: string
+          pattern: '^\+?[1-9]\d{1,14}$'
+          example: "(555) 123-4567"
+        subject:
+          type: string
+          maxLength: 200
+          example: "Class schedule inquiry"
+        message:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          example: "I'm interested in learning more about your beginner classes."
+        preferred_contact:
+          type: string
+          enum: [email, phone, either]
+          default: email
+        best_time:
+          type: string
+          example: "Weekday mornings"
+        how_heard:
+          type: string
+          enum: [google, social_media, friend, drive_by, other]
+          example: "google"
+
+    MembershipInquiryData:
+      type: object
+      required:
+        - form-name
+        - name
+        - email
+        - membership_interest
+      properties:
+        form-name:
+          type: string
+          enum: [membership-inquiry]
+          description: Netlify form identifier
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          pattern: '^[a-zA-Z\s\-\.]+$'
+          example: "John Smith"
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: "john.smith@example.com"
+        phone:
+          type: string
+          pattern: '^\+?[1-9]\d{1,14}$'
+          example: "(555) 987-6543"
+        membership_interest:
+          type: array
+          items:
+            type: string
+            enum: [drop-in, monthly, annual, class-packages]
+          minItems: 1
+          example: ["monthly", "class-packages"]
+        experience_level:
+          type: string
+          enum: [beginner, intermediate, advanced, mixed]
+          example: "beginner"
+        class_preferences:
+          type: array
+          items:
+            type: string
+            enum: [morning, afternoon, evening, weekend]
+          example: ["morning", "weekend"]
+        yoga_styles:
+          type: array
+          items:
+            type: string
+            enum: [vinyasa, hatha, yin, restorative, hot, power]
+          example: ["vinyasa", "yin"]
+        goals:
+          type: string
+          maxLength: 500
+          example: "Improve flexibility and reduce stress"
+        injuries_limitations:
+          type: string
+          maxLength: 500
+          example: "Lower back sensitivity"
+        preferred_contact:
+          type: string
+          enum: [email, phone, either]
+          default: email
+        ready_to_start:
+          type: string
+          enum: [immediately, this_week, this_month, just_exploring]
+          example: "this_week"
+        questions:
+          type: string
+          maxLength: 1000
+          example: "Do you offer trial classes?"
+
+  securitySchemes:
+    netlifyForms:
+      type: apiKey
+      in: header
+      name: X-Netlify-Form
+      description: Netlify Forms bot protection
+
+security:
+  - netlifyForms: []

@@ -1,0 +1,560 @@
+---
+// Instructors page - meet our teaching team
+import Layout from '../layouts/Layout.astro'
+import InstructorProfile from '../components/InstructorProfile.astro'
+import PhotoGallery from '../components/PhotoGallery.astro'
+import ContactForm from '../components/ContactForm.astro'
+import { getAllInstructors, getFeaturedInstructors, getInstructorsBySpecialty } from '../services/instructorService'
+import { getPhotosByCategory } from '../services/photoService'
+import { getStudioInfo } from '../services/studioService'
+
+// Fetch all required data
+const [studioData, allInstructors, featuredInstructors, classPhotos] = await Promise.all([
+  getStudioInfo({ preview: false }),
+  getAllInstructors({ preview: false }),
+  getFeaturedInstructors({ preview: false, limit: 6 }),
+  getPhotosByCategory('classes', { preview: false, limit: 8 })
+])
+
+// Group instructors by specialties for filtering
+const specialties = [...new Set(
+  allInstructors?.flatMap(instructor => instructor.specialties || []) || []
+)].sort()
+
+// Page metadata
+const pageTitle = `Our Instructors - ${studioData?.name || 'Yoga Studio'}`
+const pageDescription = 'Meet our experienced yoga instructors. Our passionate teaching team brings decades of combined experience in various yoga styles, meditation, and wellness practices.'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/instructors"
+>
+  <main class="instructors-page">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient-to-br from-purple-50 via-white to-blue-50 py-16 md:py-24">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-16">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
+            Meet Our Teachers
+          </h1>
+          <p class="text-xl md:text-2xl text-slate-600 leading-relaxed max-w-4xl mx-auto mb-8">
+            Our passionate and experienced instructors are dedicated to guiding you on your yoga journey. 
+            Each brings their unique style, expertise, and heart to create transformative experiences.
+          </p>
+          
+          <!-- Teaching Philosophy Highlights -->
+          <div class="flex flex-wrap justify-center gap-8 text-slate-700">
+            <div class="flex items-center">
+              <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+              <span class="font-medium">Heart-Centered Teaching</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              <span class="font-medium">Continuing Education</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <span class="font-medium">Inclusive Practice</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Instructors Section -->
+    {featuredInstructors && featuredInstructors.length > 0 && (
+      <section class="featured-instructors-section py-16 bg-white">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+              Featured Teachers
+            </h2>
+            <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+              Get to know some of our most experienced and beloved instructors who help shape our studio community.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {featuredInstructors.map((instructor) => (
+              <InstructorProfile 
+                instructor={instructor}
+                variant="featured"
+                className="transform hover:scale-105 transition-transform duration-200"
+                key={instructor._id}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- All Instructors Section with Filtering -->
+    <section class="all-instructors-section py-16 bg-slate-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Our Full Teaching Team
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Browse our complete roster of certified instructors and find the perfect teacher for your practice.
+          </p>
+        </div>
+
+        <!-- Specialty Filters -->
+        {specialties && specialties.length > 0 && (
+          <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <button 
+              class="filter-button active px-6 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition-colors"
+              data-filter="all"
+            >
+              All Teachers
+            </button>
+            {specialties.map((specialty) => (
+              <button 
+                class="filter-button px-6 py-3 bg-white text-slate-700 font-semibold rounded-full hover:bg-slate-100 border-2 border-slate-200 transition-colors"
+                data-filter={specialty.toLowerCase().replace(/\s+/g, '-')}
+                key={specialty}
+              >
+                {specialty}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <!-- Instructors Grid -->
+        {allInstructors && allInstructors.length > 0 ? (
+          <div class="instructors-grid grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {allInstructors.map((instructor) => (
+              <div 
+                class="instructor-item"
+                data-specialties={instructor.specialties?.map(s => s.toLowerCase().replace(/\s+/g, '-')).join(' ') || ''}
+                key={instructor._id}
+              >
+                <InstructorProfile 
+                  instructor={instructor}
+                  variant="card"
+                  className="h-full"
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-16">
+            <div class="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Meet Our Amazing Team</h3>
+            <p class="text-slate-500 text-lg max-w-2xl mx-auto">
+              Our instructor profiles are being updated. In the meantime, feel free to visit the studio 
+              to meet our wonderful teaching team in person!
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Class Photos Section -->
+    {classPhotos && classPhotos.length > 0 && (
+      <section class="class-photos-section py-16 bg-white">
+        <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+              Our Classes in Action
+            </h2>
+            <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+              See our instructors and students in their element during various classes and workshops.
+            </p>
+          </div>
+
+          <PhotoGallery 
+            photos={classPhotos}
+            layout="grid"
+            showFilters={false}
+            showLoadMore={false}
+            className="mb-8"
+          />
+
+          <div class="text-center">
+            <a 
+              href="/gallery" 
+              class="inline-flex items-center px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition-colors duration-200"
+            >
+              View Full Gallery
+              <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Teaching Philosophy Section -->
+    <section class="philosophy-section py-16 bg-gradient-to-r from-slate-50 to-purple-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Our Teaching Philosophy
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            What unites all our instructors is a shared commitment to creating safe, inclusive, 
+            and transformative experiences for every student.
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">
+              How We Teach
+            </h3>
+            <div class="space-y-6">
+              <div class="philosophy-point">
+                <h4 class="text-lg font-semibold text-slate-900 mb-2">Student-Centered Approach</h4>
+                <p class="text-slate-600">
+                  Every class is designed with students' needs, limitations, and goals in mind. 
+                  We meet you where you are and help you grow from there.
+                </p>
+              </div>
+              
+              <div class="philosophy-point">
+                <h4 class="text-lg font-semibold text-slate-900 mb-2">Safety First</h4>
+                <p class="text-slate-600">
+                  Proper alignment, mindful movement, and injury prevention are at the core 
+                  of every instruction we provide.
+                </p>
+              </div>
+              
+              <div class="philosophy-point">
+                <h4 class="text-lg font-semibold text-slate-900 mb-2">Inclusive Environment</h4>
+                <p class="text-slate-600">
+                  We welcome all bodies, backgrounds, and experience levels. Modifications 
+                  and props are always offered to make poses accessible.
+                </p>
+              </div>
+              
+              <div class="philosophy-point">
+                <h4 class="text-lg font-semibold text-slate-900 mb-2">Mind-Body Connection</h4>
+                <p class="text-slate-600">
+                  Beyond physical postures, we emphasize breath awareness, mindfulness, 
+                  and the deeper aspects of yoga practice.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="order-first lg:order-last">
+            <div class="bg-white rounded-2xl p-8 shadow-lg">
+              <blockquote class="text-lg text-slate-700 italic leading-relaxed mb-6">
+                "Teaching yoga is about creating space for students to discover their own strength, 
+                flexibility, and inner wisdom. We're here to guide, support, and celebrate every 
+                step of your journey."
+              </blockquote>
+              <cite class="text-slate-500 font-medium">
+                - Our Teaching Team
+              </cite>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Qualifications & Training Section -->
+    <section class="qualifications-section py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            Expertise & Training
+          </h2>
+          <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            Our instructors bring diverse backgrounds and extensive training to create rich, 
+            well-rounded teaching experiences.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Certification Standards -->
+          <div class="qualification-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Yoga Alliance Certified</h3>
+            <p class="text-slate-600">
+              All our lead instructors hold 200-hour or 500-hour certifications from Yoga Alliance registered schools.
+            </p>
+          </div>
+
+          <!-- Continuing Education -->
+          <div class="qualification-card bg-slate-50 rounded-xl p-8 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Ongoing Education</h3>
+            <p class="text-slate-600">
+              Our teachers regularly attend workshops, retreats, and advanced trainings to stay current and inspired.
+            </p>
+          </div>
+
+          <!-- Specialized Training -->
+          <div class="qualification-card bg-slate-50 rounded-xl p-8 text-center md:col-span-2 lg:col-span-1">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Specialized Skills</h3>
+            <p class="text-slate-600">
+              Many of our instructors have additional certifications in areas like prenatal yoga, trauma-informed teaching, and meditation.
+            </p>
+          </div>
+        </div>
+
+        <!-- Common Specialties List -->
+        {specialties && specialties.length > 0 && (
+          <div class="mt-12 text-center">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Areas of Expertise</h3>
+            <div class="flex flex-wrap justify-center gap-3">
+              {specialties.map((specialty) => (
+                <span 
+                  class="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium"
+                  key={specialty}
+                >
+                  {specialty}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Join Our Community Section -->
+    <section class="community-section py-16 bg-slate-50">
+      <div class="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+              Ready to Practice With Us?
+            </h2>
+            <p class="text-xl text-slate-600 mb-8 leading-relaxed">
+              Whether you're a complete beginner or an experienced practitioner, our instructors 
+              are here to support and guide your yoga journey. Come experience the difference 
+              that passionate, qualified teaching can make.
+            </p>
+            
+            <div class="space-y-4">
+              <div class="flex items-center text-slate-700">
+                <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>First class is always free for new students</span>
+              </div>
+              <div class="flex items-center text-slate-700">
+                <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>All levels welcome in every class</span>
+              </div>
+              <div class="flex items-center text-slate-700">
+                <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Personalized attention and modifications</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 mt-8">
+              <a 
+                href="/membership" 
+                class="inline-flex items-center justify-center px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition-colors duration-200"
+              >
+                View Class Schedule
+                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+              </a>
+              
+              <a 
+                href="/contact" 
+                class="inline-flex items-center justify-center px-8 py-3 border-2 border-slate-900 text-slate-900 font-semibold rounded-full hover:bg-slate-900 hover:text-white transition-all duration-200"
+              >
+                Contact Us
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <ContactForm 
+              formType="instructor-question"
+              variant="instructor"
+              showSubjectOptions={false}
+              className="bg-white rounded-xl shadow-lg p-8"
+              placeholder="Have questions about our classes or want to know which instructor might be best for you? We're here to help!"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "Our Yoga Instructors",
+    "description": "{pageDescription}",
+    "url": "{Astro.url.href}",
+    "mainEntity": {
+      "@type": "YogaStudio",
+      "name": "{studioData?.name || 'Yoga Studio'}",
+      "employee": allInstructors ? allInstructors.map(instructor => ({
+        "@type": "Person",
+        "name": instructor.name,
+        "jobTitle": "Yoga Instructor",
+        "description": instructor.bio,
+        "knowsAbout": instructor.specialties?.join(', '),
+        "yearsOfExperience": instructor.yearsOfExperience,
+        "image": instructor.photo ? instructor.photo.url : undefined
+      })) : []
+    }
+  }
+  </script>
+</Layout>
+
+<style>
+  .instructors-page {
+    @apply min-h-screen;
+  }
+
+  /* Filter Button Styles */
+  .filter-button.active {
+    @apply bg-purple-600 text-white border-purple-600;
+  }
+
+  .filter-button.active:hover {
+    @apply bg-purple-700;
+  }
+
+  /* Instructor Item Filtering */
+  .instructor-item.hidden {
+    @apply hidden;
+  }
+
+  .instructor-item {
+    @apply transition-all duration-300;
+  }
+
+  /* Qualification Cards */
+  .qualification-card {
+    @apply transform hover:scale-105 transition-all duration-200 hover:shadow-lg;
+  }
+
+  /* Philosophy Points */
+  .philosophy-point {
+    @apply border-l-4 border-purple-200 pl-6 transition-all duration-200 hover:border-purple-400;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .instructors-page h1 {
+      @apply text-3xl;
+    }
+    
+    .instructors-page h2 {
+      @apply text-2xl;
+    }
+
+    .filter-button {
+      @apply text-sm px-4 py-2;
+    }
+
+    .instructors-grid {
+      @apply grid-cols-1 md:grid-cols-2;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    .instructors-page {
+      @apply text-black bg-white;
+    }
+    
+    .hero-section,
+    .featured-instructors-section,
+    .all-instructors-section,
+    .class-photos-section,
+    .philosophy-section,
+    .qualifications-section,
+    .community-section {
+      @apply shadow-none;
+    }
+
+    .filter-button {
+      @apply hidden;
+    }
+
+    .instructor-item {
+      @apply block !important;
+    }
+  }
+</style>
+
+<script>
+  // Filter functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-button')
+    const instructorItems = document.querySelectorAll('.instructor-item')
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.getAttribute('data-filter')
+        
+        // Update active button
+        filterButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-purple-600', 'text-white', 'border-purple-600')
+          btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200')
+        })
+        
+        button.classList.add('active', 'bg-purple-600', 'text-white', 'border-purple-600')
+        button.classList.remove('bg-white', 'text-slate-700', 'border-slate-200')
+        
+        // Filter instructor items
+        instructorItems.forEach(item => {
+          if (filter === 'all') {
+            item.classList.remove('hidden')
+          } else {
+            const specialties = item.getAttribute('data-specialties') || ''
+            if (specialties.includes(filter)) {
+              item.classList.remove('hidden')
+            } else {
+              item.classList.add('hidden')
+            }
+          }
+        })
+
+        // Smooth scroll animation for grid
+        const grid = document.querySelector('.instructors-grid')
+        if (grid) {
+          grid.style.opacity = '0.5'
+          setTimeout(() => {
+            grid.style.opacity = '1'
+          }, 150)
+        }
+      })
+    })
+  })
+</script>

@@ -1,0 +1,160 @@
+---
+// Simple Instructors page
+import Layout from '../layouts/Layout.astro'
+
+const pageTitle = 'Our Instructors - Serenity Yoga Studio'
+const pageDescription = 'Meet our experienced and passionate yoga instructors dedicated to guiding your practice and supporting your journey.'
+
+// Static instructor data
+const instructors = [
+  {
+    id: '1',
+    name: 'Sarah Chen',
+    title: 'Senior Instructor & Studio Director',
+    experience: '8+ years',
+    specialties: ['Vinyasa', 'Yin Yoga', 'Meditation'],
+    certifications: ['RYT-500', 'Yin Yoga Certification', 'Meditation Teacher Training'],
+    bio: 'Sarah discovered yoga during a stressful period in her corporate career and it completely transformed her life. With over 8 years of teaching experience, she specializes in creating flows that balance strength and flexibility while emphasizing mindfulness and breath awareness. Sarah believes yoga is a practice of self-compassion and meets each student exactly where they are.',
+    schedule: ['Monday 7:00 AM - Vinyasa Flow', 'Wednesday 6:00 PM - Yin Yoga', 'Saturday 9:00 AM - All Levels Hatha']
+  },
+  {
+    id: '2',
+    name: 'Michael Rodriguez',
+    title: 'Lead Instructor',
+    experience: '6+ years',
+    specialties: ['Hatha', 'Restorative', 'Pranayama'],
+    certifications: ['RYT-200', 'Restorative Yoga Certification', 'Breathwork Training'],
+    bio: 'Michael brings a calming and grounded presence to his classes. His background in physical therapy informs his teaching, with a strong emphasis on proper alignment and injury prevention. He loves helping students develop a deeper connection to their breath and find stillness in movement. His classes are perfect for beginners and those seeking a more meditative practice.',
+    schedule: ['Tuesday 8:00 AM - Hatha Basics', 'Thursday 7:00 PM - Restorative', 'Sunday 10:00 AM - Breathwork & Meditation']
+  },
+  {
+    id: '3',
+    name: 'Emily Johnson',
+    title: 'Power Yoga Specialist',
+    experience: '4+ years',
+    specialties: ['Power Yoga', 'Vinyasa', 'Core Strengthening'],
+    certifications: ['RYT-200', 'Power Yoga Certification'],
+    bio: 'Emily brings energy and enthusiasm to every class she teaches. As a former athlete, she understands the importance of building both physical and mental strength. Her power yoga classes are challenging yet accessible, focusing on proper form and modifications for all levels. She believes that everyone can build strength and confidence through consistent practice.',
+    schedule: ['Monday 6:00 PM - Power Flow', 'Wednesday 7:00 AM - Morning Power', 'Friday 6:30 PM - Core & Flow']
+  },
+  {
+    id: '4',
+    name: 'Lisa Park',
+    title: 'Gentle & Therapeutic Yoga',
+    experience: '5+ years',
+    specialties: ['Gentle Yoga', 'Chair Yoga', 'Therapeutic'],
+    certifications: ['RYT-200', 'Therapeutic Yoga Certification', 'Senior Yoga Training'],
+    bio: 'Lisa specializes in making yoga accessible to everyone, regardless of age, mobility, or experience level. Her gentle approach and modifications ensure that every student feels welcome and supported. She has extensive training in therapeutic yoga and loves working with seniors and those recovering from injuries.',
+    schedule: ['Tuesday 10:00 AM - Gentle Flow', 'Thursday 2:00 PM - Chair Yoga', 'Saturday 11:00 AM - Therapeutic Yoga']
+  }
+]
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical="/instructors"
+>
+  <main class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-purple-50 to-white py-20">
+      <div class="container mx-auto px-4 max-w-6xl text-center">
+        <h1 class="text-5xl font-bold text-gray-800 mb-6">Meet Our Instructors</h1>
+        <p class="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+          Our passionate and experienced teachers are here to guide you on your yoga journey. 
+          Each brings their unique style and expertise to create a supportive, inspiring environment for all students.
+        </p>
+      </div>
+    </section>
+
+    <!-- Instructors Grid -->
+    <section class="py-16">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="space-y-16">
+          {instructors.map((instructor, index) => (
+            <div class={`grid lg:grid-cols-2 gap-12 items-start ${index % 2 === 1 ? 'lg:grid-flow-dense' : ''}`}>
+              <!-- Photo -->
+              <div class={`${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
+                <div class="bg-gray-200 w-80 h-80 rounded-lg mx-auto flex items-center justify-center">
+                  <div class="text-center">
+                    <div class="text-6xl mb-4">👩‍🏫</div>
+                    <p class="text-gray-500">{instructor.name}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Info -->
+              <div class={`${index % 2 === 1 ? 'lg:col-start-1 lg:row-start-1' : ''}`}>
+                <div class="space-y-6">
+                  <div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">{instructor.name}</h2>
+                    <p class="text-xl text-purple-600 font-semibold mb-1">{instructor.title}</p>
+                    <p class="text-gray-600">{instructor.experience} teaching experience</p>
+                  </div>
+                  
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Specialties</h3>
+                    <div class="flex flex-wrap gap-2">
+                      {instructor.specialties.map(specialty => (
+                        <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                          {specialty}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">About</h3>
+                    <p class="text-gray-600 leading-relaxed">{instructor.bio}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Teaching Schedule</h3>
+                    <ul class="space-y-1">
+                      {instructor.schedule.map(schedule => (
+                        <li class="text-gray-600 flex items-center">
+                          <span class="text-green-500 mr-2">•</span>
+                          {schedule}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Certifications</h3>
+                    <ul class="space-y-1">
+                      {instructor.certifications.map(cert => (
+                        <li class="text-gray-600 flex items-center">
+                          <span class="text-blue-500 mr-2">✓</span>
+                          {cert}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Join Us Section -->
+    <section class="py-16 bg-purple-600 text-white">
+      <div class="container mx-auto px-4 max-w-4xl text-center">
+        <h2 class="text-3xl font-bold mb-4">Find Your Perfect Class</h2>
+        <p class="text-xl mb-8 opacity-90">
+          Ready to practice with one of our amazing instructors? Check out our class schedule and find the perfect fit for your practice.
+        </p>
+        <div class="flex justify-center space-x-4">
+          <a href="/membership" class="bg-white text-purple-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+            View Class Schedule
+          </a>
+          <a href="/contact" class="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-purple-600 transition-colors font-semibold">
+            Ask Questions
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

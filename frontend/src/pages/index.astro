@@ -1,0 +1,908 @@
+---
+// Homepage - main landing page with hero section and key content areas
+// Showcases the yoga studio with featured content and calls to action
+
+import Layout from '../layouts/Layout.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import StudioInfo from '../components/StudioInfo.astro'
+import MembershipCard from '../components/MembershipCard.astro'
+import InstructorProfile from '../components/InstructorProfile.astro'
+import PhotoGallery from '../components/PhotoGallery.astro'
+
+// Import services
+import { getStudioInfo } from '../services/studioService'
+import { getPopularPlans } from '../services/membershipService'
+import { getFeaturedInstructors } from '../services/instructorService'
+import { getFeaturedPhotos } from '../services/photoService'
+import { imageUtils } from '../utils/imageUtils'
+
+// Fetch all data for the homepage with fallback handling
+let studioData, popularPlans, featuredInstructors, featuredPhotos
+
+try {
+  const results = await Promise.allSettled([
+    getStudioInfo({ preview: false }),
+    getPopularPlans({ preview: false }),
+    getFeaturedInstructors({ preview: false, limit: 3 }),
+    getFeaturedPhotos({ preview: false, limit: 6 })
+  ])
+  
+  studioData = results[0].status === 'fulfilled' ? results[0].value : null
+  popularPlans = results[1].status === 'fulfilled' ? results[1].value : []
+  featuredInstructors = results[2].status === 'fulfilled' ? results[2].value : []
+  featuredPhotos = results[3].status === 'fulfilled' ? results[3].value : []
+} catch (error) {
+  console.error('Error fetching homepage data:', error)
+  studioData = null
+  popularPlans = []
+  featuredInstructors = []
+  featuredPhotos = []
+}
+
+// Prepare hero background image
+const heroImage = featuredPhotos?.find(photo => photo.category === 'studio-space') || featuredPhotos?.[0] || null
+
+// Page metadata
+const pageTitle = studioData ? `${studioData.name} - Find Your Balance` : 'Serenity Yoga Studio'
+const pageDescription = studioData?.description || 'Join our welcoming yoga community. Classes for all levels in a peaceful, supportive environment.'
+---
+
+<Layout 
+  title={pageTitle}
+  description={pageDescription}
+  canonical={Astro.url.href}
+>
+  <Header slot="header" showCta={true} />
+
+  <main class="homepage">
+    <!-- Hero Section -->
+    <section 
+      class="hero-section"
+      style={heroImage ? `background-image: ${imageUtils.hero(heroImage.image)}` : ''}
+      data-testid="hero-section"
+    >
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            Find Your Inner Peace
+          </h1>
+          <p class="hero-subtitle">
+            Join our welcoming community of yogis in a space designed for growth, 
+            healing, and transformation. All levels welcome.
+          </p>
+          <div class="hero-actions">
+            <a href="/membership" class="hero-cta primary">
+              Start Your Journey
+            </a>
+            <a href="/about" class="hero-cta secondary">
+              Learn More
+            </a>
+          </div>
+        </div>
+        
+        {studioData && (
+          <div class="hero-info-card">
+            <div class="info-item">
+              <span class="info-label">Location</span>
+              <span class="info-value">
+                {studioData.address.city}, {studioData.address.state}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Contact</span>
+              <span class="info-value">{studioData.phone}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">New Students</span>
+              <span class="info-value">Always Welcome</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Welcome Section -->
+    {studioData && (
+      <section class="welcome-section" data-testid="welcome-section">
+        <div class="section-container">
+          <div class="welcome-content">
+            <div class="welcome-text">
+              <h2 class="section-title">Welcome to {studioData.name}</h2>
+              {studioData.tagline && (
+                <p class="section-tagline">{studioData.tagline}</p>
+              )}
+              <p class="section-description">
+                {studioData.description}
+              </p>
+              <p class="welcome-extended">
+                Whether you're a complete beginner or an experienced practitioner, 
+                our studio offers a supportive environment where you can explore 
+                your practice at your own pace. Join us for a journey of self-discovery, 
+                strength, and serenity.
+              </p>
+              <a href="/about" class="welcome-cta">
+                Our Story
+              </a>
+            </div>
+            <div class="welcome-image">
+              {featuredPhotos.filter(p => p.category === 'studio-space')[0] && (
+                <img 
+                  src={imageUtils.responsive(featuredPhotos.filter(p => p.category === 'studio-space')[0].image).src}
+                  srcset={imageUtils.responsive(featuredPhotos.filter(p => p.category === 'studio-space')[0].image).srcset}
+                  sizes={imageUtils.responsive(featuredPhotos.filter(p => p.category === 'studio-space')[0].image).sizes}
+                  alt={featuredPhotos.filter(p => p.category === 'studio-space')[0].altText || 'Studio interior'}
+                  loading="lazy"
+                  class="welcome-photo"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Membership Plans Section -->
+    {popularPlans.length > 0 && (
+      <section class="membership-section" data-testid="membership-section">
+        <div class="section-container">
+          <div class="section-header">
+            <h2 class="section-title">Choose Your Path</h2>
+            <p class="section-subtitle">
+              Flexible membership options designed to fit your lifestyle and practice goals
+            </p>
+          </div>
+          
+          <div class="membership-grid">
+            {popularPlans.slice(0, 3).map((plan) => (
+              <MembershipCard 
+                key={plan._id}
+                plan={plan} 
+                highlightFeatured={true}
+                className="homepage-membership-card"
+              />
+            ))}
+          </div>
+          
+          <div class="section-footer">
+            <a href="/membership" class="section-cta">
+              View All Plans
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Featured Instructors Section -->
+    {featuredInstructors.length > 0 && (
+      <section class="instructors-section" data-testid="instructors-section">
+        <div class="section-container">
+          <div class="section-header">
+            <h2 class="section-title">Meet Your Teachers</h2>
+            <p class="section-subtitle">
+              Experienced, passionate instructors dedicated to guiding your practice
+            </p>
+          </div>
+          
+          <div class="instructors-grid">
+            {featuredInstructors.map((instructor) => (
+              <InstructorProfile 
+                key={instructor._id}
+                instructor={instructor}
+                variant="compact"
+                showMetadata={false}
+                expandableBio={true}
+                className="homepage-instructor-card"
+              />
+            ))}
+          </div>
+          
+          <div class="section-footer">
+            <a href="/instructors" class="section-cta">
+              Meet All Instructors
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Studio Gallery Section -->
+    {featuredPhotos.length > 0 && (
+      <section class="gallery-section" data-testid="gallery-section">
+        <div class="section-container">
+          <div class="section-header">
+            <h2 class="section-title">Experience Our Space</h2>
+            <p class="section-subtitle">
+              A peaceful sanctuary designed to support your practice and well-being
+            </p>
+          </div>
+          
+          <PhotoGallery 
+            photos={featuredPhotos}
+            layout="grid"
+            columns={3}
+            showMetadata={false}
+            enableLightbox={true}
+            highlightFeatured={false}
+            className="homepage-gallery"
+          />
+          
+          <div class="section-footer">
+            <a href="/gallery" class="section-cta">
+              View Full Gallery
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Call to Action Section -->
+    <section class="cta-section" data-testid="cta-section">
+      <div class="section-container">
+        <div class="cta-content">
+          <h2 class="cta-title">Ready to Begin Your Journey?</h2>
+          <p class="cta-subtitle">
+            Join our community and discover the transformative power of yoga. 
+            New students receive a special welcome package.
+          </p>
+          <div class="cta-actions">
+            <a href="/membership" class="cta-button primary">
+              Get Started Today
+            </a>
+            <a href="/contact" class="cta-button secondary">
+              Ask Questions
+            </a>
+          </div>
+          
+          <div class="cta-features">
+            <div class="feature-item">
+              <span class="feature-icon">🧘‍♀️</span>
+              <span class="feature-text">All Levels Welcome</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🤝</span>
+              <span class="feature-text">Supportive Community</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🌟</span>
+              <span class="feature-text">Experienced Teachers</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🏡</span>
+              <span class="feature-text">Welcoming Space</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Information Section -->
+    {studioData && (
+      <section class="contact-preview-section" data-testid="contact-preview-section">
+        <div class="section-container">
+          <StudioInfo 
+            studioData={studioData}
+            variant="compact"
+            className="homepage-studio-info"
+          />
+        </div>
+      </section>
+    )}
+  </main>
+
+  <Footer slot="footer" showNewsletter={true} />
+</Layout>
+
+<style>
+/* Homepage Styles */
+.homepage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(34, 197, 94, 0.4) 50%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+}
+
+.hero-text {
+  text-align: center;
+  max-width: 600px;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 1s ease-out;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  margin: 0 0 2rem 0;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  min-width: 160px;
+}
+
+.hero-cta.primary {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+}
+
+.hero-cta.primary:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(34, 197, 94, 0.4);
+}
+
+.hero-cta.secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.hero-cta.secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.hero-info-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
+  padding: 2rem;
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  max-width: 500px;
+  animation: fadeInUp 1s ease-out 0.9s both;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Section Containers */
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Welcome Section */
+.welcome-section {
+  padding: 5rem 0;
+  background: #f9fafb;
+}
+
+.welcome-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.welcome-text {
+  max-width: 600px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.section-tagline {
+  font-size: 1.25rem;
+  color: #22c55e;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+}
+
+.section-description {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #4b5563;
+  margin: 0 0 1.5rem 0;
+}
+
+.welcome-extended {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #6b7280;
+  margin: 0 0 2rem 0;
+}
+
+.welcome-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: #22c55e;
+  color: white;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.welcome-cta:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.welcome-image {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.welcome-image:hover .welcome-photo {
+  transform: scale(1.05);
+}
+
+/* Section Headers */
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-subtitle {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #6b7280;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Membership Section */
+.membership-section {
+  padding: 5rem 0;
+  background: white;
+}
+
+.membership-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Instructors Section */
+.instructors-section {
+  padding: 5rem 0;
+  background: #f9fafb;
+}
+
+.instructors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Gallery Section */
+.gallery-section {
+  padding: 5rem 0;
+  background: white;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  text-align: center;
+}
+
+.cta-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.cta-subtitle {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 2rem 0;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  min-width: 160px;
+}
+
+.cta-button.primary {
+  background: white;
+  color: #22c55e;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button.primary:hover {
+  background: #f9fafb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cta-button.secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.cta-button.secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.cta-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.feature-icon {
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Contact Preview Section */
+.contact-preview-section {
+  padding: 3rem 0;
+  background: #f9fafb;
+}
+
+/* Section Footer */
+.section-footer {
+  text-align: center;
+}
+
+.section-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.875rem 1.75rem;
+  background: #22c55e;
+  color: white;
+  text-decoration: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease;
+}
+
+.section-cta:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+  
+  .hero-actions {
+    flex-wrap: nowrap;
+  }
+  
+  .welcome-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+  
+  .membership-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+  
+  .cta-features {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 4.5rem;
+  }
+  
+  .section-title {
+    font-size: 3rem;
+  }
+  
+  .cta-title {
+    font-size: 3rem;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+  .hero-section {
+    min-height: 100vh;
+    background-attachment: scroll;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.125rem;
+  }
+  
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .hero-cta {
+    width: 100%;
+  }
+  
+  .hero-info-card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .section-container {
+    padding: 0 1rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .membership-grid,
+  .instructors-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cta-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .cta-button {
+    width: 100%;
+  }
+  
+  .cta-features {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .hero-section {
+    background: none !important;
+    color: #000;
+    min-height: auto;
+    padding: 2rem 0;
+  }
+  
+  .hero-overlay {
+    display: none;
+  }
+  
+  .cta-section {
+    background: none !important;
+    color: #000;
+  }
+  
+  .hero-cta,
+  .cta-button,
+  .section-cta,
+  .welcome-cta {
+    background: #000 !important;
+    color: white !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .hero-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .hero-cta,
+  .cta-button,
+  .section-cta,
+  .welcome-cta {
+    border: 2px solid;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .hero-title,
+  .hero-subtitle,
+  .hero-actions,
+  .hero-info-card {
+    animation: none;
+  }
+  
+  .hero-section {
+    background-attachment: scroll;
+  }
+  
+  .hero-cta,
+  .cta-button,
+  .section-cta,
+  .welcome-cta,
+  .welcome-photo {
+    transition: none;
+  }
+  
+  .welcome-image:hover .welcome-photo,
+  .hero-cta:hover,
+  .cta-button:hover,
+  .section-cta:hover,
+  .welcome-cta:hover {
+    transform: none;
+  }
+}
+</style>

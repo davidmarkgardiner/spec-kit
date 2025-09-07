@@ -1,0 +1,370 @@
+openapi: 3.0.0
+info:
+  title: Yoga Studio Content API
+  description: Sanity CMS content delivery for yoga studio website
+  version: 1.0.0
+  contact:
+    name: Yoga Studio Website
+    
+servers:
+  - url: https://PROJECT_ID.api.sanity.io/v2024-01-01/data/query/production
+    description: Sanity production dataset
+
+paths:
+  /studio-info:
+    get:
+      summary: Get studio information
+      description: Retrieve core studio details including contact info and hours
+      operationId: getStudioInfo
+      responses:
+        '200':
+          description: Studio information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudioInfo'
+        '404':
+          description: Studio information not found
+
+  /membership-plans:
+    get:
+      summary: Get active membership plans
+      description: Retrieve all currently available membership options
+      operationId: getMembershipPlans
+      responses:
+        '200':
+          description: Membership plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MembershipPlan'
+
+  /instructors:
+    get:
+      summary: Get active instructors
+      description: Retrieve all currently active instructor profiles
+      operationId: getInstructors
+      responses:
+        '200':
+          description: Instructors retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instructor'
+
+  /photos:
+    get:
+      summary: Get studio photos
+      description: Retrieve categorized studio and class photos
+      operationId: getPhotos
+      parameters:
+        - name: category
+          in: query
+          description: Filter photos by category
+          schema:
+            type: string
+            enum: [studio-space, equipment, classes-in-session, exterior]
+        - name: featured
+          in: query
+          description: Filter for featured photos only
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Photos retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+
+components:
+  schemas:
+    StudioInfo:
+      type: object
+      required:
+        - name
+        - address
+        - phone
+        - email
+        - hours
+      properties:
+        name:
+          type: string
+          example: "Serenity Yoga Studio"
+        tagline:
+          type: string
+          example: "Find your inner peace"
+        description:
+          type: string
+          example: "A welcoming community yoga studio offering classes for all levels"
+        address:
+          $ref: '#/components/schemas/Address'
+        phone:
+          type: string
+          pattern: '^\+?[1-9]\d{1,14}$'
+          example: "(555) 123-4567"
+        email:
+          type: string
+          format: email
+          example: "hello@serenityyoga.com"
+        website:
+          type: string
+          format: uri
+          example: "https://serenityyoga.com"
+        socialMedia:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialMediaLink'
+        hours:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessHours'
+
+    Address:
+      type: object
+      required:
+        - street
+        - city
+        - state
+        - zipCode
+      properties:
+        street:
+          type: string
+          example: "123 Peaceful Lane"
+        city:
+          type: string
+          example: "Mindful City"
+        state:
+          type: string
+          example: "CA"
+        zipCode:
+          type: string
+          pattern: '^\d{5}(-\d{4})?$'
+          example: "90210"
+
+    BusinessHours:
+      type: object
+      required:
+        - day
+        - isClosed
+      properties:
+        day:
+          type: string
+          enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+        openTime:
+          type: string
+          pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+          example: "06:00"
+        closeTime:
+          type: string
+          pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+          example: "21:00"
+        isClosed:
+          type: boolean
+          example: false
+
+    SocialMediaLink:
+      type: object
+      required:
+        - platform
+        - url
+      properties:
+        platform:
+          type: string
+          enum: [facebook, instagram, twitter, youtube, tiktok]
+        url:
+          type: string
+          format: uri
+          example: "https://instagram.com/serenityyoga"
+
+    MembershipPlan:
+      type: object
+      required:
+        - name
+        - price
+        - billingCycle
+        - isActive
+      properties:
+        name:
+          type: string
+          example: "Monthly Unlimited"
+        description:
+          type: string
+          example: "Unlimited classes with premium benefits"
+        price:
+          type: number
+          minimum: 0
+          example: 99.99
+        billingCycle:
+          type: string
+          enum: [monthly, annual, drop-in]
+        duration:
+          type: integer
+          minimum: 1
+          example: 12
+        classesIncluded:
+          type: integer
+          minimum: 1
+          nullable: true
+          example: null
+        benefits:
+          type: array
+          items:
+            type: string
+          example: ["Unlimited classes", "Guest passes", "Workshop discounts"]
+        restrictions:
+          type: string
+          example: "Valid at all locations"
+        isPopular:
+          type: boolean
+          example: true
+        isActive:
+          type: boolean
+          example: true
+
+    Instructor:
+      type: object
+      required:
+        - name
+        - firstName
+        - lastName
+        - bio
+        - photo
+        - isActive
+      properties:
+        name:
+          type: string
+          example: "Sarah Johnson"
+        firstName:
+          type: string
+          example: "Sarah"
+        lastName:
+          type: string
+          example: "Johnson"
+        title:
+          type: string
+          example: "RYT-500, Senior Instructor"
+        bio:
+          type: string
+          minLength: 100
+          example: "Sarah has been practicing yoga for over 15 years..."
+        photo:
+          $ref: '#/components/schemas/ImageAsset'
+        certifications:
+          type: array
+          items:
+            type: string
+          example: ["RYT-500", "Yin Yoga Certified", "Meditation Teacher"]
+        specialties:
+          type: array
+          items:
+            type: string
+          example: ["Vinyasa Flow", "Restorative Yoga", "Meditation"]
+        experience:
+          type: integer
+          minimum: 0
+          example: 8
+        email:
+          type: string
+          format: email
+          example: "sarah@serenityyoga.com"
+        socialMedia:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialMediaLink'
+        isActive:
+          type: boolean
+          example: true
+
+    Photo:
+      type: object
+      required:
+        - title
+        - image
+        - altText
+        - category
+      properties:
+        title:
+          type: string
+          example: "Main yoga studio space"
+        image:
+          $ref: '#/components/schemas/ImageAsset'
+        altText:
+          type: string
+          example: "Bright, spacious yoga studio with natural lighting and bamboo floors"
+        category:
+          type: string
+          enum: [studio-space, equipment, classes-in-session, exterior]
+        featured:
+          type: boolean
+          example: false
+        sortOrder:
+          type: integer
+          example: 1
+        photographer:
+          type: string
+          example: "Jane Smith Photography"
+        dateTaken:
+          type: string
+          format: date
+          example: "2024-03-15"
+
+    ImageAsset:
+      type: object
+      required:
+        - _type
+        - asset
+      properties:
+        _type:
+          type: string
+          enum: [image]
+        asset:
+          type: object
+          required:
+            - _ref
+            - _type
+          properties:
+            _ref:
+              type: string
+              example: "image-abc123-1920x1080-jpg"
+            _type:
+              type: string
+              enum: [reference]
+        hotspot:
+          type: object
+          description: Image focal point for cropping
+          properties:
+            x:
+              type: number
+              minimum: 0
+              maximum: 1
+            y:
+              type: number
+              minimum: 0
+              maximum: 1
+        crop:
+          type: object
+          description: Image cropping information
+          properties:
+            left:
+              type: number
+              minimum: 0
+              maximum: 1
+            top:
+              type: number
+              minimum: 0
+              maximum: 1
+            right:
+              type: number
+              minimum: 0
+              maximum: 1
+            bottom:
+              type: number
+              minimum: 0
+              maximum: 1
