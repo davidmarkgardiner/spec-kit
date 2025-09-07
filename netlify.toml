@@ -308,8 +308,5 @@
   package = "netlify-plugin-cache-nextjs"
 
 # Environment variable validation
-[build.environment]
-  # Required environment variables
-  SANITY_PROJECT_ID = { required = true }
-  SANITY_DATASET = { required = true }
-  PUBLIC_SITE_URL = { required = true }
+# Note: Required environment variables should be set in Netlify dashboard
+# SANITY_PROJECT_ID, SANITY_DATASET, PUBLIC_SITE_URL
