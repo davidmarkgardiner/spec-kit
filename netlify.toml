@@ -174,8 +174,9 @@
   node_bundler = "esbuild"
 
 # Edge functions configuration
-[edge_functions]
-  directory = "netlify/edge-functions"
+# [[edge_functions]]
+#   path = "/api/example"
+#   function = "example"
 
 # Build hooks and notifications
 [notifications]
