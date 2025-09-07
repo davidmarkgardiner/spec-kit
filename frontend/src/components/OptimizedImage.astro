@@ -1,0 +1,105 @@
+---
+// Optimized Image Component - A reusable component for all images in your yoga studio site
+import { getOptimizedImageUrl, getResponsiveImageUrls, type ImageOptions } from '../lib/cloudinary'
+
+export interface Props {
+  src: string // Cloudinary public ID or full URL
+  alt: string
+  width?: number
+  height?: number
+  class?: string
+  loading?: 'lazy' | 'eager'
+  responsive?: boolean
+  // Cloudinary-specific options
+  quality?: ImageOptions['quality']
+  format?: ImageOptions['format']
+  crop?: ImageOptions['crop']
+  gravity?: ImageOptions['gravity']
+  effects?: {
+    blur?: number
+    brightness?: number
+    contrast?: number
+    saturation?: number
+  }
+  overlay?: ImageOptions['overlay']
+}
+
+const {
+  src,
+  alt,
+  width = 800,
+  height,
+  class: className = '',
+  loading = 'lazy',
+  responsive = false,
+  quality = 'auto',
+  format = 'auto',
+  crop,
+  gravity,
+  effects,
+  overlay,
+  ...rest
+} = Astro.props
+
+// Build Cloudinary options
+const cloudinaryOptions: ImageOptions = {
+  width,
+  height,
+  quality,
+  format,
+  crop,
+  gravity,
+  overlay,
+  ...(effects && {
+    blur: effects.blur,
+    brightness: effects.brightness,
+    contrast: effects.contrast,
+    saturation: effects.saturation,
+  })
+}
+
+// Check if src is already a full URL or just a public ID
+const isCloudinaryId = !src.startsWith('http')
+const publicId = isCloudinaryId ? src : src.split('/').pop()?.split('.')[0] || src
+
+let imageSrc: string
+let srcSet: string | undefined
+
+if (responsive && isCloudinaryId) {
+  const responsiveUrls = getResponsiveImageUrls(publicId, { 
+    quality, 
+    format, 
+    crop, 
+    gravity,
+    ...(effects && {
+      blur: effects.blur,
+      brightness: effects.brightness,
+      contrast: effects.contrast,
+      saturation: effects.saturation,
+    })
+  })
+  
+  imageSrc = responsiveUrls.desktop
+  srcSet = `
+    ${responsiveUrls.mobile} 640w,
+    ${responsiveUrls.tablet} 768w,
+    ${responsiveUrls.desktop} 1024w,
+    ${responsiveUrls.large} 1920w
+  `.trim()
+} else if (isCloudinaryId) {
+  imageSrc = getOptimizedImageUrl(publicId, cloudinaryOptions)
+} else {
+  // Fallback for non-Cloudinary URLs
+  imageSrc = src
+}
+---
+
+<img
+  src={imageSrc}
+  alt={alt}
+  class={className}
+  loading={loading}
+  srcset={srcSet}
+  sizes={responsive ? "(max-width: 640px) 640px, (max-width: 768px) 768px, (max-width: 1024px) 1024px, 1920px" : undefined}
+  {...rest}
+/>

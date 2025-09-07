@@ -73,30 +73,38 @@ const sortedPhotos = [...photos].sort((a, b) => {
   return aValue > bValue ? 1 : aValue < bValue ? -1 : 0
 })
 
+// Import Sanity image URL builder
+import { urlFor } from '../lib/sanity'
+
 // Generate image URL with Sanity CDN optimization
 const getImageUrl = (image: any, size: 'thumb' | 'medium' | 'large' = 'medium') => {
-  if (!image?.asset?._ref) return '/placeholder-photo.jpg'
+  if (!image?.asset) return '/placeholder-photo.jpg'
   
-  const ref = image.asset._ref
-  const [, id, dimensions, format] = ref.match(/image-([a-f0-9]+)-(\d+x\d+)-(\w+)/) || []
-  
-  if (!id) return '/placeholder-photo.jpg'
+  // Handle direct URLs (for mock data or external images)
+  if (image.asset.url && !image.asset._ref) {
+    return image.asset.url
+  }
   
   const sizeMap = {
-    thumb: 'w=400&h=300',
-    medium: 'w=800&h=600', 
-    large: 'w=1600&h=1200'
+    thumb: { width: 400, height: 300 },
+    medium: { width: 800, height: 600 }, 
+    large: { width: 1600, height: 1200 }
   }
   
-  let url = `https://cdn.sanity.io/images/project-id/dataset/${id}-${dimensions}.${format}`
-  url += `?${sizeMap[size]}&fit=crop&auto=format&q=80`
+  const { width, height } = sizeMap[size]
   
-  // Apply hotspot if available
-  if (image.hotspot) {
-    url += `&fp-x=${image.hotspot.x}&fp-y=${image.hotspot.y}`
+  try {
+    return urlFor(image)
+      .width(width)
+      .height(height)
+      .fit('crop')
+      .auto('format')
+      .quality(80)
+      .url()
+  } catch (error) {
+    console.error('Error generating image URL:', error)
+    return '/placeholder-photo.jpg'
   }
-  
-  return url
 }
 
 // Get category display name

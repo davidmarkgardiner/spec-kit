@@ -6,7 +6,7 @@ import imageUrlBuilder from '@sanity/image-url'
 import type { SanityImageSource } from '@sanity/image-url/lib/types'
 
 // Environment configuration
-const projectId = import.meta.env.SANITY_PROJECT_ID || 'your-project-id'
+const projectId = import.meta.env.SANITY_PROJECT_ID || 'rwm8hvis'
 const dataset = import.meta.env.SANITY_DATASET || 'production'
 const apiVersion = import.meta.env.SANITY_API_VERSION || '2024-01-01'
 const useCdn = import.meta.env.PROD // Use CDN in production

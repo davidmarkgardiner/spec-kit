@@ -1,0 +1,354 @@
+---
+// Enhanced Photo Gallery with Cloudinary Integration
+import CloudinaryPhotoService from '../services/cloudinaryPhotoService'
+import OptimizedImage from './OptimizedImage.astro'
+
+export interface Props {
+  category?: string
+  limit?: number
+  featured?: boolean
+  showThumbnails?: boolean
+  enableLightbox?: boolean
+  className?: string
+}
+
+const { 
+  category, 
+  limit = 12, 
+  featured = false, 
+  showThumbnails = true,
+  enableLightbox = true,
+  className = '' 
+} = Astro.props
+
+// Fetch photos based on props
+let photos
+if (category) {
+  photos = await CloudinaryPhotoService.getPhotosByCategory(category, { 
+    limit, 
+    featured 
+  })
+} else if (featured) {
+  photos = await CloudinaryPhotoService.getFeaturedPhotos({ limit })
+} else {
+  photos = await CloudinaryPhotoService.getPhotos({ 
+    limit,
+    sortBy: 'sortOrder',
+    sortOrder: 'asc'
+  })
+}
+
+// Process photos for optimized gallery display
+const processedPhotos = await CloudinaryPhotoService.processPhotosForGallery(photos, {
+  thumbnailSize: 400,
+  previewSize: 1200,
+  enableHover: true
+})
+
+// Generate unique ID for this gallery instance
+const galleryId = `gallery-${Math.random().toString(36).substr(2, 9)}`
+---
+
+<div class={`enhanced-photo-gallery ${className}`} data-gallery-id={galleryId}>
+  {photos.length === 0 ? (
+    <div class="empty-state text-center py-12">
+      <div class="text-gray-400 text-6xl mb-4">📸</div>
+      <h3 class="text-xl font-semibold text-gray-600 mb-2">No Photos Found</h3>
+      <p class="text-gray-500">
+        {category 
+          ? `No photos available in the "${CloudinaryPhotoService.getCategoryDisplayName(category)}" category.`
+          : 'No photos available in the gallery.'
+        }
+      </p>
+    </div>
+  ) : (
+    <>
+      <!-- Gallery Header -->
+      <div class="gallery-header mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">
+          {category 
+            ? `${CloudinaryPhotoService.getCategoryDisplayName(category)} Gallery`
+            : featured 
+              ? 'Featured Photos' 
+              : 'Photo Gallery'
+          }
+        </h2>
+        <p class="text-gray-600">
+          {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+          {category && ` in ${CloudinaryPhotoService.getCategoryDisplayName(category)}`}
+        </p>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div class="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        {processedPhotos.map((item, index) => {
+          const { photo, thumbnail, preview, hover, lazyConfig } = item
+          const performanceConfig = CloudinaryPhotoService.generatePerformanceConfig(
+            photo, 
+            index < 3 ? 'gallery' : 'thumbnail'
+          )
+          
+          return (
+            <div 
+              class="gallery-item group relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer bg-gray-100"
+              data-photo-id={photo._id}
+              data-category={photo.category}
+            >
+              {/* Main Image */}
+              <div class="aspect-square relative overflow-hidden">
+                <OptimizedImage
+                  src={thumbnail.split('/').pop()?.split('.')[0] || 'sample'}
+                  alt={CloudinaryPhotoService.generateAltText(photo)}
+                  width={400}
+                  height={400}
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading={performanceConfig.loading}
+                  crop="fill"
+                  gravity="auto"
+                  quality="auto"
+                  responsive={false}
+                />
+                
+                {/* Hover Overlay */}
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                  <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {enableLightbox && (
+                      <button 
+                        class="bg-white text-gray-800 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors"
+                        data-action="view-photo"
+                        data-photo-url={preview}
+                        data-photo-title={photo.title}
+                      >
+                        View Full Size
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Featured Badge */}
+                {photo.featured && (
+                  <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-medium">
+                    ⭐ Featured
+                  </div>
+                )}
+              </div>
+
+              {/* Photo Info */}
+              <div class="p-4">
+                <h3 class="font-semibold text-gray-800 mb-1 line-clamp-2">
+                  {photo.title}
+                </h3>
+                
+                {photo.caption && (
+                  <p class="text-gray-600 text-sm mb-2 line-clamp-2">
+                    {photo.caption}
+                  </p>
+                )}
+
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                  <span class="bg-gray-100 px-2 py-1 rounded-full">
+                    {CloudinaryPhotoService.getCategoryDisplayName(photo.category)}
+                  </span>
+                  
+                  {photo.dateTaken && (
+                    <span>
+                      {CloudinaryPhotoService.formatPhotoDate(photo.dateTaken)}
+                    </span>
+                  )}
+                </div>
+
+                {photo.photographer && (
+                  <div class="mt-2 text-xs text-gray-400">
+                    📸 {photo.photographer}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Load More Button (if there are more photos) */}
+      {photos.length === limit && (
+        <div class="text-center mt-8">
+          <button 
+            class="load-more-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            data-category={category}
+            data-featured={featured}
+            data-current-limit={limit}
+          >
+            Load More Photos
+          </button>
+        </div>
+      )}
+    </>
+  )}
+</div>
+
+{/* Lightbox Modal (if enabled) */}
+{enableLightbox && (
+  <div id={`lightbox-${galleryId}`} class="lightbox fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center p-4">
+    <div class="lightbox-content max-w-4xl max-h-full relative">
+      <button 
+        class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 z-10"
+        data-action="close-lightbox"
+      >
+        ×
+      </button>
+      
+      <img 
+        id={`lightbox-image-${galleryId}`}
+        class="max-w-full max-h-full object-contain"
+        alt=""
+      />
+      
+      <div class="absolute bottom-4 left-4 right-4 text-white">
+        <h3 id={`lightbox-title-${galleryId}`} class="text-xl font-semibold mb-2"></h3>
+        <div class="flex justify-between items-center">
+          <button 
+            id={`lightbox-prev-${galleryId}`}
+            class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors"
+            data-action="prev-photo"
+          >
+            ← Previous
+          </button>
+          <button 
+            id={`lightbox-next-${galleryId}`}
+            class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition-colors"
+            data-action="next-photo"
+          >
+            Next →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .gallery-item:hover .aspect-square img {
+    transform: scale(1.05);
+  }
+
+  .lightbox {
+    backdrop-filter: blur(4px);
+  }
+
+  .lightbox.show {
+    display: flex;
+  }
+</style>
+
+<script define:vars={{ galleryId, enableLightbox }}>
+  if (enableLightbox) {
+    // Lightbox functionality
+    let currentPhotoIndex = 0
+    let galleryPhotos = []
+
+    // Initialize gallery photos array
+    document.querySelectorAll(`[data-gallery-id="${galleryId}"] .gallery-item`).forEach((item, index) => {
+      const img = item.querySelector('img')
+      const title = item.querySelector('h3').textContent
+      const viewButton = item.querySelector('[data-action="view-photo"]')
+      
+      if (viewButton) {
+        const photoData = {
+          url: viewButton.dataset.photoUrl,
+          title: viewButton.dataset.photoTitle || title,
+          index
+        }
+        galleryPhotos.push(photoData)
+
+        // Add click handler
+        item.addEventListener('click', () => openLightbox(index))
+      }
+    })
+
+    function openLightbox(index) {
+      currentPhotoIndex = index
+      const photo = galleryPhotos[index]
+      const lightbox = document.getElementById(`lightbox-${galleryId}`)
+      const lightboxImage = document.getElementById(`lightbox-image-${galleryId}`)
+      const lightboxTitle = document.getElementById(`lightbox-title-${galleryId}`)
+
+      lightboxImage.src = photo.url
+      lightboxImage.alt = photo.title
+      lightboxTitle.textContent = photo.title
+
+      lightbox.classList.add('show')
+      document.body.style.overflow = 'hidden'
+    }
+
+    function closeLightbox() {
+      const lightbox = document.getElementById(`lightbox-${galleryId}`)
+      lightbox.classList.remove('show')
+      document.body.style.overflow = 'auto'
+    }
+
+    function showPrevPhoto() {
+      currentPhotoIndex = (currentPhotoIndex - 1 + galleryPhotos.length) % galleryPhotos.length
+      openLightbox(currentPhotoIndex)
+    }
+
+    function showNextPhoto() {
+      currentPhotoIndex = (currentPhotoIndex + 1) % galleryPhotos.length
+      openLightbox(currentPhotoIndex)
+    }
+
+    // Event listeners
+    document.addEventListener('click', (e) => {
+      if (e.target.dataset.action === 'close-lightbox') {
+        closeLightbox()
+      } else if (e.target.dataset.action === 'prev-photo') {
+        showPrevPhoto()
+      } else if (e.target.dataset.action === 'next-photo') {
+        showNextPhoto()
+      }
+    })
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      const lightbox = document.getElementById(`lightbox-${galleryId}`)
+      if (lightbox.classList.contains('show')) {
+        if (e.key === 'Escape') {
+          closeLightbox()
+        } else if (e.key === 'ArrowLeft') {
+          showPrevPhoto()
+        } else if (e.key === 'ArrowRight') {
+          showNextPhoto()
+        }
+      }
+    })
+
+    // Close on backdrop click
+    document.getElementById(`lightbox-${galleryId}`).addEventListener('click', (e) => {
+      if (e.target.classList.contains('lightbox')) {
+        closeLightbox()
+      }
+    })
+  }
+
+  // Load more functionality
+  const loadMoreBtn = document.querySelector(`[data-gallery-id="${galleryId}"] .load-more-btn`)
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', async () => {
+      // This would typically make an AJAX request to load more photos
+      // For now, just show a message
+      loadMoreBtn.textContent = 'Loading...'
+      loadMoreBtn.disabled = true
+      
+      // Simulate loading delay
+      setTimeout(() => {
+        loadMoreBtn.textContent = 'Load More Photos'
+        loadMoreBtn.disabled = false
+      }, 1000)
+    })
+  }
+</script>

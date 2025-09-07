@@ -2,6 +2,7 @@
 // Implements the contract defined in photos.test.ts
 
 import { sanityFetch, groqFragments, sanityHelpers, urlFor, type SanityDocument, type SanityImage } from '../lib/sanity'
+import { mockStudioPhotos } from '../data/mockData'
 
 // Mock photo data
 const mockPhotos = [
@@ -81,7 +82,26 @@ const photosQuery = `
     _updatedAt,
     _rev,
     title,
-    image ${groqFragments.image},
+    image {
+      _type,
+      alt,
+      asset-> {
+        _id,
+        url,
+        metadata {
+          dimensions {
+            width,
+            height,
+            aspectRatio
+          },
+          lqip,
+          hasAlpha,
+          isOpaque
+        }
+      },
+      hotspot,
+      crop
+    },
     altText,
     category,
     featured,
@@ -104,7 +124,26 @@ const featuredPhotosQuery = `
     _updatedAt,
     _rev,
     title,
-    image ${groqFragments.image},
+    image {
+      _type,
+      alt,
+      asset-> {
+        _id,
+        url,
+        metadata {
+          dimensions {
+            width,
+            height,
+            aspectRatio
+          },
+          lqip,
+          hasAlpha,
+          isOpaque
+        }
+      },
+      hotspot,
+      crop
+    },
     altText,
     category,
     featured,
@@ -127,7 +166,26 @@ const photosByCategoryQuery = `
     _updatedAt,
     _rev,
     title,
-    image ${groqFragments.image},
+    image {
+      _type,
+      alt,
+      asset-> {
+        _id,
+        url,
+        metadata {
+          dimensions {
+            width,
+            height,
+            aspectRatio
+          },
+          lqip,
+          hasAlpha,
+          isOpaque
+        }
+      },
+      hotspot,
+      crop
+    },
     altText,
     category,
     featured,
@@ -193,10 +251,10 @@ export class PhotoService {
         }
       )
 
-      return result || []
+      return result || mockStudioPhotos
     } catch (error) {
-      console.error('Failed to fetch photos:', error)
-      throw new Error('Unable to load photos')
+      console.error('Failed to fetch photos, using mock data:', error)
+      return mockStudioPhotos
     }
   }
 
@@ -295,24 +353,37 @@ export class PhotoService {
         }
       )
 
-      let filteredMock = mockPhotos.filter(p => p.featured)
-      if (options?.category) {
-        filteredMock = filteredMock.filter(p => p.category === options.category)
+      // If no featured photos found, fallback to all photos with same filters
+      if (!result || result.length === 0) {
+        console.log('No featured photos found, falling back to all photos')
+        return await this.getPhotos({
+          preview: options?.preview,
+          category: options?.category,
+          limit: options?.limit
+        })
       }
-      if (options?.limit) {
-        filteredMock = filteredMock.slice(0, options.limit)
-      }
-      return result || filteredMock
+
+      return result
     } catch (error) {
-      console.error('Failed to fetch featured photos, using mock data:', error)
-      let filteredMock = mockPhotos.filter(p => p.featured)
-      if (options?.category) {
-        filteredMock = filteredMock.filter(p => p.category === options.category)
+      console.error('Failed to fetch featured photos, falling back to all photos:', error)
+      // Fallback to all photos
+      try {
+        return await this.getPhotos({
+          preview: options?.preview,
+          category: options?.category,
+          limit: options?.limit
+        })
+      } catch (fallbackError) {
+        console.error('Fallback to all photos also failed, using mock data:', fallbackError)
+        let filteredMock = mockPhotos.filter(p => p.featured)
+        if (options?.category) {
+          filteredMock = filteredMock.filter(p => p.category === options.category)
+        }
+        if (options?.limit) {
+          filteredMock = filteredMock.slice(0, options.limit)
+        }
+        return filteredMock
       }
-      if (options?.limit) {
-        filteredMock = filteredMock.slice(0, options.limit)
-      }
-      return filteredMock
     }
   }
 
@@ -368,10 +439,10 @@ export class PhotoService {
         }
       )
 
-      return result || []
+      return result || mockStudioPhotos.filter(p => p.category === category)
     } catch (error) {
-      console.error(`Failed to fetch photos for category ${category}:`, error)
-      throw new Error(`Unable to load ${category} photos`)
+      console.error(`Failed to fetch photos for category ${category}, using mock data:`, error)
+      return mockStudioPhotos.filter(p => p.category === category)
     }
   }
 

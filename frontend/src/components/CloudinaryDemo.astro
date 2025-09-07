@@ -1,0 +1,406 @@
+---
+// Cloudinary Demo Component - Shows various image transformation capabilities
+import { 
+  getOptimizedImageUrl, 
+  getResponsiveImageUrls, 
+  getThumbnailUrl, 
+  getPlaceholderUrl,
+  getOptimizedVideoUrl,
+  type ImageOptions 
+} from '../lib/cloudinary'
+
+// Sample images from Cloudinary's demo collection
+const sampleImages = [
+  'sample',
+  'woman',
+  'food/sandwich',
+  'animals/kitten',
+  'nature/flowers',
+  'sports/basketball'
+]
+
+// Demo transformations to showcase
+const demoTransformations: Array<{ title: string; options: ImageOptions; description: string }> = [
+  {
+    title: 'Original',
+    options: {},
+    description: 'No transformations applied'
+  },
+  {
+    title: 'Auto Optimized',
+    options: { width: 400, quality: 'auto', format: 'auto' },
+    description: 'Automatic quality and format optimization'
+  },
+  {
+    title: 'Cropped Square',
+    options: { width: 300, height: 300, crop: 'fill', gravity: 'auto' },
+    description: 'Square crop with smart gravity detection'
+  },
+  {
+    title: 'Blur Effect',
+    options: { width: 400, blur: 300 },
+    description: 'Blur effect applied'
+  },
+  {
+    title: 'Enhanced Colors',
+    options: { width: 400, brightness: 20, contrast: 15, saturation: 30 },
+    description: 'Enhanced brightness, contrast, and saturation'
+  },
+  {
+    title: 'With Text Overlay',
+    options: { 
+      width: 400, 
+      overlay: { 
+        text: 'YOGA STUDIO', 
+        position: 'bottom-right' 
+      } 
+    },
+    description: 'Text overlay positioned bottom-right'
+  }
+]
+
+// Sample image for responsive demo
+const responsiveImageId = 'sample'
+const responsiveUrls = getResponsiveImageUrls(responsiveImageId, { quality: 'auto' })
+---
+
+<div class="cloudinary-demo p-8 max-w-7xl mx-auto">
+  <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">
+    🌟 Cloudinary Integration Demo
+  </h1>
+  
+  <div class="mb-8 bg-blue-50 p-6 rounded-lg">
+    <h2 class="text-2xl font-semibold mb-4 text-blue-800">What is Cloudinary?</h2>
+    <p class="text-gray-700 mb-4">
+      Cloudinary is a comprehensive cloud-based image and video management solution that provides:
+    </p>
+    <ul class="list-disc list-inside text-gray-600 space-y-2">
+      <li><strong>Automatic Optimization:</strong> Smart compression, format selection (WebP, AVIF), and quality adjustment</li>
+      <li><strong>Dynamic Transformations:</strong> Resize, crop, rotate, apply effects in real-time via URL parameters</li>
+      <li><strong>Responsive Images:</strong> Generate multiple sizes for different devices automatically</li>
+      <li><strong>Advanced Effects:</strong> Blur, brightness, contrast, overlays, and AI-powered enhancements</li>
+      <li><strong>Fast CDN Delivery:</strong> Global content delivery network for fast image loading</li>
+      <li><strong>SEO Benefits:</strong> Faster page loads improve search rankings</li>
+    </ul>
+  </div>
+
+  <!-- Image Transformations Demo -->
+  <section class="mb-12">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-800">🎨 Image Transformations</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {demoTransformations.map((demo) => (
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="aspect-video bg-gray-100 flex items-center justify-center">
+            <img 
+              src={getOptimizedImageUrl('sample', demo.options)}
+              alt={demo.title}
+              class="max-w-full max-h-full object-contain"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-lg mb-2">{demo.title}</h3>
+            <p class="text-gray-600 text-sm mb-3">{demo.description}</p>
+            <details class="text-xs">
+              <summary class="cursor-pointer text-blue-600 hover:text-blue-800">
+                View Transformation Code
+              </summary>
+              <pre class="mt-2 p-2 bg-gray-100 rounded overflow-x-auto">
+{`getOptimizedImageUrl('sample', ${JSON.stringify(demo.options, null, 2)})`}
+              </pre>
+            </details>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Responsive Images Demo -->
+  <section class="mb-12">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-800">📱 Responsive Images</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <p class="text-gray-700 mb-4">
+        Cloudinary automatically generates optimized images for different screen sizes:
+      </p>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
+        {Object.entries(responsiveUrls).map(([breakpoint, url]) => (
+          <div class="text-center">
+            <div class="bg-gray-100 rounded-lg p-2 mb-2">
+              <img 
+                src={url} 
+                alt={`${breakpoint} version`}
+                class="w-full h-24 object-cover rounded"
+                loading="lazy"
+              />
+            </div>
+            <h4 class="font-medium capitalize">{breakpoint}</h4>
+            <p class="text-xs text-gray-500">
+              {breakpoint === 'mobile' && '640px'}
+              {breakpoint === 'tablet' && '768px'}
+              {breakpoint === 'desktop' && '1024px'}
+              {breakpoint === 'large' && '1920px'}
+              {breakpoint === 'xlarge' && '2560px'}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <details class="text-sm">
+        <summary class="cursor-pointer text-blue-600 hover:text-blue-800 mb-2">
+          View Responsive Code Implementation
+        </summary>
+        <pre class="p-4 bg-gray-100 rounded overflow-x-auto">
+{`// Generate responsive images
+const responsiveUrls = getResponsiveImageUrls('${responsiveImageId}', { quality: 'auto' })
+
+// Use in HTML with srcset
+<img 
+  src="\${responsiveUrls.desktop}"
+  srcset="
+    \${responsiveUrls.mobile} 640w,
+    \${responsiveUrls.tablet} 768w,
+    \${responsiveUrls.desktop} 1024w,
+    \${responsiveUrls.large} 1920w
+  "
+  sizes="(max-width: 640px) 640px, (max-width: 768px) 768px, (max-width: 1024px) 1024px, 1920px"
+  alt="Responsive image"
+/>`}
+        </pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- Thumbnails Demo -->
+  <section class="mb-12">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-800">🖼️ Smart Thumbnails</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <p class="text-gray-700 mb-4">
+        Generate consistent thumbnails with smart cropping:
+      </p>
+      
+      <div class="flex flex-wrap gap-4 mb-6">
+        {sampleImages.slice(0, 6).map((imageId) => (
+          <div class="text-center">
+            <div class="w-20 h-20 mb-2">
+              <img 
+                src={getThumbnailUrl(imageId, 80)}
+                alt={`Thumbnail of ${imageId}`}
+                class="w-full h-full object-cover rounded-lg shadow-sm"
+                loading="lazy"
+              />
+            </div>
+            <p class="text-xs text-gray-500">{imageId}</p>
+          </div>
+        ))}
+      </div>
+
+      <details class="text-sm">
+        <summary class="cursor-pointer text-blue-600 hover:text-blue-800 mb-2">
+          View Thumbnail Code
+        </summary>
+        <pre class="p-4 bg-gray-100 rounded overflow-x-auto">
+{`// Generate 80x80 thumbnail with smart cropping
+getThumbnailUrl('sample', 80)
+
+// Equivalent to:
+getOptimizedImageUrl('sample', {
+  width: 80,
+  height: 80,
+  crop: 'fill',
+  gravity: 'auto' // AI-powered smart cropping
+})`}
+        </pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- Placeholder Demo -->
+  <section class="mb-12">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-800">🎯 Placeholder Images</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <p class="text-gray-700 mb-4">
+        Generate placeholder images for development and loading states:
+      </p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="text-center">
+          <img 
+            src={getPlaceholderUrl(300, 200, 'Hero Image')}
+            alt="Hero placeholder"
+            class="w-full rounded-lg shadow-sm mb-2"
+            loading="lazy"
+          />
+          <p class="text-sm text-gray-600">Hero Image Placeholder</p>
+        </div>
+        <div class="text-center">
+          <img 
+            src={getPlaceholderUrl(200, 200, 'Profile')}
+            alt="Profile placeholder"
+            class="w-full rounded-lg shadow-sm mb-2"
+            loading="lazy"
+          />
+          <p class="text-sm text-gray-600">Profile Placeholder</p>
+        </div>
+        <div class="text-center">
+          <img 
+            src={getPlaceholderUrl(300, 150, 'Gallery')}
+            alt="Gallery placeholder"
+            class="w-full rounded-lg shadow-sm mb-2"
+            loading="lazy"
+          />
+          <p class="text-sm text-gray-600">Gallery Placeholder</p>
+        </div>
+      </div>
+
+      <details class="text-sm">
+        <summary class="cursor-pointer text-blue-600 hover:text-blue-800 mb-2">
+          View Placeholder Code
+        </summary>
+        <pre class="p-4 bg-gray-100 rounded overflow-x-auto">
+{`// Generate placeholder with custom text
+getPlaceholderUrl(300, 200, 'Hero Image')
+
+// Generate simple placeholder
+getPlaceholderUrl(200, 200)`}
+        </pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- Performance Benefits -->
+  <section class="mb-12">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-800">⚡ Performance Benefits</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-green-700">✅ With Cloudinary</h3>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• <strong>Automatic format selection:</strong> WebP for modern browsers, fallback to JPEG</li>
+            <li>• <strong>Smart compression:</strong> 60-80% smaller file sizes without quality loss</li>
+            <li>• <strong>Global CDN:</strong> Images served from nearest location</li>
+            <li>• <strong>Lazy loading ready:</strong> Generate low-quality placeholders</li>
+            <li>• <strong>Responsive by default:</strong> Perfect size for every device</li>
+            <li>• <strong>SEO optimized:</strong> Faster page loads = better rankings</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-red-700">❌ Without Cloudinary</h3>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• Manual image optimization required</li>
+            <li>• Large file sizes slow down page loads</li>
+            <li>• Manual responsive image generation</li>
+            <li>• No automatic format conversion</li>
+            <li>• Server storage costs for multiple versions</li>
+            <li>• Poor mobile performance</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- URL Examples -->
+  <section class="mb-12">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-800">🔗 URL Examples</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <p class="text-gray-700 mb-4">
+        See how Cloudinary transforms images through URL parameters:
+      </p>
+      
+      <div class="space-y-4 text-sm">
+        <div class="border-l-4 border-blue-500 pl-4">
+          <p class="font-medium">Original Image:</p>
+          <code class="block mt-1 p-2 bg-gray-100 rounded break-all">
+            https://res.cloudinary.com/dgkk4uhse/image/upload/sample
+          </code>
+        </div>
+        
+        <div class="border-l-4 border-green-500 pl-4">
+          <p class="font-medium">Auto-optimized (400px wide, auto quality & format):</p>
+          <code class="block mt-1 p-2 bg-gray-100 rounded break-all">
+            {getOptimizedImageUrl('sample', { width: 400, quality: 'auto', format: 'auto' })}
+          </code>
+        </div>
+        
+        <div class="border-l-4 border-purple-500 pl-4">
+          <p class="font-medium">Square thumbnail with smart crop:</p>
+          <code class="block mt-1 p-2 bg-gray-100 rounded break-all">
+            {getThumbnailUrl('sample', 150)}
+          </code>
+        </div>
+        
+        <div class="border-l-4 border-orange-500 pl-4">
+          <p class="font-medium">With effects and text overlay:</p>
+          <code class="block mt-1 p-2 bg-gray-100 rounded break-all">
+            {getOptimizedImageUrl('sample', { 
+              width: 400, 
+              brightness: 20, 
+              overlay: { text: 'YOGA STUDIO', position: 'center' } 
+            })}
+          </code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Integration Guide -->
+  <section class="mb-8">
+    <h2 class="text-3xl font-semibold mb-6 text-gray-800">🚀 How to Use in Your Project</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="prose max-w-none">
+        <h3 class="text-lg font-semibold mb-3">1. Environment Setup</h3>
+        <p class="text-gray-700 mb-4">Add your Cloudinary credentials to <code>.env</code>:</p>
+        <pre class="p-4 bg-gray-100 rounded overflow-x-auto mb-6">
+PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+        </pre>
+
+        <h3 class="text-lg font-semibold mb-3">2. Basic Usage</h3>
+        <pre class="p-4 bg-gray-100 rounded overflow-x-auto mb-6">
+{`import { getOptimizedImageUrl, getResponsiveImageUrls } from '../lib/cloudinary'
+
+// Simple optimization
+const optimizedUrl = getOptimizedImageUrl('my-image', {
+  width: 800,
+  quality: 'auto',
+  format: 'auto'
+})
+
+// Responsive images
+const responsiveUrls = getResponsiveImageUrls('my-image')
+// Use responsiveUrls.mobile, responsiveUrls.desktop, etc.`}
+        </pre>
+
+        <h3 class="text-lg font-semibold mb-3">3. In Astro Components</h3>
+        <pre class="p-4 bg-gray-100 rounded overflow-x-auto">
+{`---
+import { getOptimizedImageUrl } from '../lib/cloudinary'
+const heroImage = getOptimizedImageUrl('hero-image', { 
+  width: 1200, 
+  height: 600, 
+  crop: 'fill' 
+})
+---
+
+<img src={heroImage} alt="Hero" class="w-full h-auto" />`}
+        </pre>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .cloudinary-demo {
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  
+  pre {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  details[open] summary {
+    margin-bottom: 8px;
+  }
+</style>

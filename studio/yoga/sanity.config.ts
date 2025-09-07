@@ -1,8 +1,8 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
-import {schemaTypes} from './schemas'
-import {structure, singletonTypes} from './schemas/schemaConfig'
+import {schemaTypes} from './schemaTypes'
+import {structure, singletonTypes} from './schemaTypes/schemaConfig'
 
 // Environment configuration
 const projectId = process.env.SANITY_PROJECT_ID || 'rwm8hvis'

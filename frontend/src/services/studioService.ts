@@ -19,7 +19,7 @@ const mockStudioInfo = {
     zipCode: '94501',
     country: 'USA'
   },
-  phone: '(555) 123-YOGA',
+  phone: '15551234567',
   email: 'hello@serenityyoga.com',
   website: 'https://serenityyoga.com',
   hours: [
