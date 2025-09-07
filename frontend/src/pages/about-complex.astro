@@ -53,11 +53,14 @@ const pageDescription = studioData?.description || 'Learn about our yoga studio,
         
         <!-- Studio Information Component -->
         <div class="mb-16">
-          <StudioInfo 
-            variant="detailed"
-            className="bg-white rounded-2xl shadow-lg"
-            showFullDetails={true}
-          />
+          {studioData && (
+            <StudioInfo 
+              studioData={studioData}
+              variant="detailed"
+              className="bg-white rounded-2xl shadow-lg"
+              showFullDetails={true}
+            />
+          )}
         </div>
       </div>
     </section>

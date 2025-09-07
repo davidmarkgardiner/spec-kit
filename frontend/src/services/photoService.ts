@@ -362,7 +362,7 @@ export class PhotoService {
       // If no featured photos found, fallback to all photos with same filters
       if (!result || result.length === 0) {
         console.log('No featured photos found, falling back to all photos')
-        return await this.getPhotos({
+        return await PhotoService.getPhotos({
           preview: options?.preview,
           category: options?.category,
           limit: options?.limit
@@ -374,7 +374,7 @@ export class PhotoService {
       console.error('Failed to fetch featured photos, falling back to all photos:', error)
       // Fallback to all photos
       try {
-        return await this.getPhotos({
+        return await PhotoService.getPhotos({
           preview: options?.preview,
           category: options?.category,
           limit: options?.limit
@@ -473,7 +473,7 @@ export class PhotoService {
       const grouped: Record<string, StudioPhoto[]> = {}
 
       for (const category of categories) {
-        grouped[category] = await this.getPhotosByCategory(category, {
+        grouped[category] = await PhotoService.getPhotosByCategory(category, {
           preview: options?.preview,
           featured: options?.featured
         })
@@ -617,7 +617,7 @@ export class PhotoService {
     recentPhotos: number
   }> {
     try {
-      const photos = await this.getPhotos({ preview: options?.preview })
+      const photos = await PhotoService.getPhotos({ preview: options?.preview })
       
       const featuredCount = photos.filter(p => p.featured).length
       
@@ -833,7 +833,7 @@ export class PhotoService {
       }
 
       // Fall back to same category photos
-      const categoryPhotos = await this.getPhotosByCategory(photo.category, {
+      const categoryPhotos = await PhotoService.getPhotosByCategory(photo.category, {
         preview: options?.preview,
         limit: limit + 1 // Get one extra to exclude current photo
       })
@@ -881,7 +881,7 @@ export class PhotoService {
     next: StudioPhoto | null
   }> {
     try {
-      const allPhotos = await this.getPhotosByCategory(photo.category, {
+      const allPhotos = await PhotoService.getPhotosByCategory(photo.category, {
         preview: options?.preview
       })
       
