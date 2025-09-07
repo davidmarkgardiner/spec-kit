@@ -4,14 +4,14 @@ import Layout from '../layouts/Layout.astro'
 import InstructorProfile from '../components/InstructorProfile.astro'
 import PhotoGallery from '../components/PhotoGallery.astro'
 import ContactForm from '../components/ContactForm.astro'
-import { getAllInstructors, getFeaturedInstructors, getInstructorsBySpecialty } from '../services/instructorService'
+import { getInstructors, getFeaturedInstructors, getInstructorsBySpecialty } from '../services/instructorService'
 import { getPhotosByCategory } from '../services/photoService'
 import { getStudioInfo } from '../services/studioService'
 
 // Fetch all required data
 const [studioData, allInstructors, featuredInstructors, classPhotos] = await Promise.all([
   getStudioInfo({ preview: false }),
-  getAllInstructors({ preview: false }),
+  getInstructors({ preview: false }),
   getFeaturedInstructors({ preview: false, limit: 6 }),
   getPhotosByCategory('classes', { preview: false, limit: 8 })
 ])

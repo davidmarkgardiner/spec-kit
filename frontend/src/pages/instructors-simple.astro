@@ -1,0 +1,38 @@
+---
+// Very simple instructors page for debugging
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout 
+  title="Our Instructors - Debug"
+  description="Debug page for instructors"
+  canonical="/instructors-simple"
+>
+  <main class="min-h-screen bg-gray-50 p-8">
+    <h1 class="text-4xl font-bold text-gray-800 mb-8">Our Instructors (Debug)</h1>
+    
+    <div class="space-y-8">
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Sarah Chen</h2>
+        <p class="text-lg text-purple-600 mb-2">Senior Instructor & Studio Director</p>
+        <p class="text-gray-600 mb-4">8+ years teaching experience</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">Vinyasa</span>
+          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">Yin Yoga</span>
+          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">Meditation</span>
+        </div>
+      </div>
+      
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Michael Rodriguez</h2>
+        <p class="text-lg text-purple-600 mb-2">Lead Instructor</p>
+        <p class="text-gray-600 mb-4">6+ years teaching experience</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">Hatha</span>
+          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">Restorative</span>
+          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">Pranayama</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
