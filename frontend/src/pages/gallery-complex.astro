@@ -2,13 +2,13 @@
 // Gallery page - studio and class photos
 import Layout from '../layouts/Layout.astro'
 import PhotoGallery from '../components/PhotoGallery.astro'
-import { getAllPhotos, getPhotosByCategory, getFeaturedPhotos } from '../services/photoService'
+import { getPhotos, getPhotosByCategory, getFeaturedPhotos } from '../services/photoService'
 import { getStudioInfo } from '../services/studioService'
 
 // Fetch all required data
 const [studioData, allPhotos, featuredPhotos] = await Promise.all([
   getStudioInfo({ preview: false }),
-  getAllPhotos({ preview: false }),
+  getPhotos({ preview: false }),
   getFeaturedPhotos({ preview: false, limit: 12 })
 ])
 

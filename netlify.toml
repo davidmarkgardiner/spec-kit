@@ -2,11 +2,11 @@
 # Comprehensive deployment and hosting configuration
 
 [build]
-  # Build command for Astro static site
-  command = "npm run build"
+  # Build command for Astro static site in frontend directory
+  command = "cd frontend && npm run build"
   
-  # Directory to publish (Astro default output)
-  publish = "dist"
+  # Directory to publish (Astro output from frontend)
+  publish = "frontend/dist"
   
   # Functions directory for serverless functions
   functions = "netlify/functions"
@@ -153,18 +153,18 @@
 
 # Environment-specific configurations
 [context.production]
-  command = "npm run build"
+  command = "cd frontend && npm run build"
   [context.production.environment]
     NODE_ENV = "production"
     HUGO_ENV = "production"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "cd frontend && npm run build"
   [context.deploy-preview.environment]
     NODE_ENV = "development"
 
 [context.branch-deploy]
-  command = "npm run build"
+  command = "cd frontend && npm run build"
   [context.branch-deploy.environment]
     NODE_ENV = "development"
 
@@ -196,12 +196,12 @@
 
 # Custom build settings for different branches
 [context.main]
-  command = "npm run build"
-  publish = "dist"
+  command = "cd frontend && npm run build"
+  publish = "frontend/dist"
 
 [context.staging]
-  command = "npm run build:staging"
-  publish = "dist"
+  command = "cd frontend && npm run build"
+  publish = "frontend/dist"
 
 # Image optimization settings
 [images]
@@ -258,15 +258,15 @@
 
 # Development settings
 [dev]
-  command = "npm run dev"
-  port = 4321
-  targetPort = 4321
-  publish = "dist"
+  command = "cd frontend && npm run dev"
+  port = 3000
+  targetPort = 3000
+  publish = "frontend/dist"
   autoLaunch = true
 
 # Branch-specific build settings
 [context.feature-branch]
-  command = "npm run build:preview"
+  command = "cd frontend && npm run build"
 
 # Performance budgets and limits
 [build.limits]
