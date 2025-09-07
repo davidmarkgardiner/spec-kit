@@ -3,7 +3,7 @@
 
 [build]
   # Build command for Astro static site in frontend directory
-  command = "cd frontend && npm run build"
+  command = "cd frontend && npm ci && npm run build"
   
   # Directory to publish (Astro output from frontend)
   publish = "frontend/dist"
@@ -153,18 +153,18 @@
 
 # Environment-specific configurations
 [context.production]
-  command = "cd frontend && npm run build"
+  command = "cd frontend && npm ci && npm run build"
   [context.production.environment]
     NODE_ENV = "production"
     HUGO_ENV = "production"
 
 [context.deploy-preview]
-  command = "cd frontend && npm run build"
+  command = "cd frontend && npm ci && npm run build"
   [context.deploy-preview.environment]
     NODE_ENV = "development"
 
 [context.branch-deploy]
-  command = "cd frontend && npm run build"
+  command = "cd frontend && npm ci && npm run build"
   [context.branch-deploy.environment]
     NODE_ENV = "development"
 
@@ -194,11 +194,11 @@
 
 # Custom build settings for different branches
 [context.main]
-  command = "cd frontend && npm run build"
+  command = "cd frontend && npm ci && npm run build"
   publish = "frontend/dist"
 
 [context.staging]
-  command = "cd frontend && npm run build"
+  command = "cd frontend && npm ci && npm run build"
   publish = "frontend/dist"
 
 # Image optimization settings
@@ -264,7 +264,7 @@
 
 # Branch-specific build settings
 [context.feature-branch]
-  command = "cd frontend && npm run build"
+  command = "cd frontend && npm ci && npm run build"
 
 # Performance budgets and limits
 [build.limits]
